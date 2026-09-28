@@ -1,0 +1,26 @@
+{
+  "name": "orcer",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Orcer — solte a prancha, receba a lista de materiais. Lê a legenda (símbolo + texto), conta cada símbolo na planta e entrega o CSV. Roda no navegador.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "contar": "tsx tools/contar.ts",
+    "bench": "tsx tools/bench.ts",
+    "test": "tsx tools/testes.ts"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "^5.1.1",
+    "pdfjs-dist": "3.11.174"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "tsx": "4.19.2",
+    "typescript": "5.7.2",
+    "vite": "6.0.7"
+  }
+}

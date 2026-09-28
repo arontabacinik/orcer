@@ -1,0 +1,229 @@
+// OS PORTÕES DO ORCER — o número que diz se ele funciona, medido contra gabarito.
+//
+//   npm run bench                 contagem (peças e metros) + legenda + lista de compra real (se houver as públicas)
+//   npm run bench -- contagem     só a contagem         env: SET=normal,dificil,lote,sinteticas  PAR=4  V=1
+//   npm run bench -- legenda      80 folhas inéditas: a legenda foi lida inteira, com o texto certo?
+//   npm run bench -- lista        21 pranchas públicas reais: nenhum lixo sai como "confirmado"
+//
+// A CONTAGEM é o número do produto: de cada item do gabarito, o motor entregou a quantidade EXATA, com cada marca
+// sobre uma ocorrência real? E nenhuma quantidade "confirmada" (ALTA) pode estar errada — teto 0.
+// As folhas de bench/pdf2 são geradas (746 MB): veja bench/README.md.
+import fs from 'node:fs';
+import path from 'node:path';
+import { spawn } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+import { analyzeDocument } from '../src/motor/motor';
+
+const aqui = fileURLToPath(import.meta.url);
+const RAIZ = path.resolve(path.dirname(aqui), '..');
+const B = path.join(RAIZ, 'bench');
+const require = createRequire(import.meta.url);
+const PAR = Math.max(1, +(process.env.PAR || 4));
+
+// META: o que foi medido na versão final (28/09/2026) e não pode cair
+const META = { pecas: 0.9, altaErrada: 0, legendaPerfeitas: 66, lixoAlta: 0 };
+
+const norm = (s: string) => (s || '').toUpperCase().normalize('NFD').replace(/[^A-Z0-9]/g, '');
+const iou = (a: number[], b: number[]) => { const x0 = Math.max(a[0], b[0]), y0 = Math.max(a[1], b[1]), x1 = Math.min(a[2], b[2]), y1 = Math.min(a[3], b[3]); const i = Math.max(0, x1 - x0) * Math.max(0, y1 - y0); const u = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - i; return u > 0 ? i / u : 0; };
+const perto = (a: number[], b: number[], m = 3) => { const cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2; return cx >= a[0] - m && cx <= a[2] + m && cy >= a[1] - m && cy <= a[3] + m; };
+
+// ---------------- filho: uma folha, um processo (as páginas são independentes) ----------------
+async function filho(pdf: string, pag?: string) {
+  const pdfjs = require('pdfjs-dist/legacy/build/pdf.js');
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(fs.readFileSync(pdf)), verbosity: 0, isEvalSupported: false }).promise;
+  const folhas = await analyzeDocument(pdfjs, doc, undefined, pag ? [+pag] : null);
+  const out = folhas.map((f) => ({
+    pagina: f.pageNum, raster: !!f.raster, prims: f.prims.length,
+    itens: f.result!.items.map((it) => ({
+      nome: (it.name || '').replace(/\s+/g, ' ').trim(), bbox: it.bbox, qtd: typeof it.qty === 'number' ? +it.qty.toFixed(2) : null,
+      unidade: it.unit, conf: it.conf, tipo: it.sw && it.sw.type,
+      marcas: (it.marks || []).map((b) => [+((b[0] + b[2]) / 2).toFixed(1), +((b[1] + b[3]) / 2).toFixed(1), +Math.max(b[2] - b[0], b[3] - b[1]).toFixed(1)]),
+      camadas: it.foundLayers || (it.sw && it.sw.routeLayers) || [],
+    })),
+  }));
+  process.stdout.write('\n@@ORCER@@' + JSON.stringify(out));
+}
+
+function rodar(args: string[]): Promise<any> {
+  return new Promise((res) => {
+    const ch = spawn(process.execPath, [...process.execArgv, '--max-old-space-size=3072', aqui, '--um', ...args], { env: { ...process.env, DBGL: '' } });
+    let out = '', err = '';
+    ch.stdout.on('data', (d) => (out += d)); ch.stderr.on('data', (d) => (err += d));
+    ch.on('close', (c) => {
+      if (c !== 0) return res({ erro: (err.split('\n').find((l) => /Error/.test(l)) || 'saída ' + c).trim().slice(0, 120) });
+      try { res({ folhas: JSON.parse(out.slice(out.lastIndexOf('@@ORCER@@') + 9)) }); } catch { res({ erro: 'saída ilegível' }); }
+    });
+  });
+}
+async function emParalelo<T>(lista: T[], f: (x: T) => Promise<void>) {
+  let i = 0;
+  await Promise.all(Array.from({ length: PAR }, async () => { while (i < lista.length) await f(lista[i++]); }));
+}
+
+// ---------------- CONTAGEM ----------------
+interface Alvo { set: string; nome: string; pdf: string; modo: 'icone' | 'nome' | 'camada'; itens?: any[]; contagens?: any; metros?: any; escaneada?: boolean; }
+function alvos(quais: string[]): Alvo[] {
+  const L: Alvo[] = [];
+  for (const [set, gt] of [['normal', 'gt_count.json'], ['dificil', 'gt_hard.json']]) {
+    if (!quais.includes(set)) continue;
+    for (const g of JSON.parse(fs.readFileSync(path.join(B, gt), 'utf8'))) {
+      if (g.opts && g.opts.scan) continue;           // escaneada: fora do produto (o motor lê o traço do CAD)
+      const pdf = path.join(B, 'pdf2', g.file);
+      if (!fs.existsSync(pdf)) { console.error(`falta ${pdf} — gere as folhas: veja bench/README.md`); process.exit(2); }
+      L.push({ set, nome: g.file.replace('.pdf', ''), pdf, modo: 'icone', itens: g.items.map((x: any) => ({ texto: x.text, icone: x.icon, n: x.count, pontos: x.inst.map((p: number[]) => [p[0], p[1]]) })) });
+    }
+  }
+  if (quais.includes('lote')) for (const f of fs.readdirSync(path.join(B, 'lote')).filter((f) => f.endsWith('.json')).sort()) {
+    const G = JSON.parse(fs.readFileSync(path.join(B, 'lote', f), 'utf8'));
+    L.push({ set: 'lote', nome: f.slice(0, -5), pdf: path.join(B, 'lote', f.replace('.json', '.pdf')), modo: 'nome', itens: G.itens.map((g: any) => ({ texto: g.texto, n: g.qtd, pontos: g.onde.map((p: number[]) => [p[0], p[1]]) })) });
+  }
+  if (quais.includes('sinteticas')) for (const f of fs.readdirSync(path.join(B, 'sinteticas')).filter((f) => f.endsWith('.json')).sort()) {
+    const G = JSON.parse(fs.readFileSync(path.join(B, 'sinteticas', f), 'utf8'));
+    L.push({ set: 'sinteticas', nome: f.slice(0, -5), pdf: path.join(B, 'sinteticas', f.replace('.json', '.pdf')), modo: 'camada', contagens: G.contagens || {}, metros: G.comprimentos_m || {} });
+  }
+  return L;
+}
+
+function julgar(S: Alvo, folhas: any[]) {
+  const r = { itens: 0, exatos: 0, alta: 0, altaErrada: 0, metros: 0, metrosExatos: 0, erradas: [] as string[], detalhe: [] as string[] };
+  const pred = folhas.flatMap((f) => f.itens).filter((it: any) => it.tipo !== 'NOTA');
+  if (S.modo === 'camada') {
+    const daCamada = (L: string) => pred.filter((i: any) => (i.camadas || []).slice(0, 1).includes(L));
+    for (const [L, esp] of Object.entries<number>(S.contagens)) {
+      r.itens++; const soma = daCamada(L).reduce((a: number, i: any) => a + (i.qtd || 0), 0);
+      if (Math.round(soma) === esp) r.exatos++; else r.detalhe.push(`${S.nome} · camada ${L} · gabarito ${esp} · motor ${soma}`);
+      const alta = daCamada(L).filter((i: any) => i.conf === 'ALTA');
+      if (alta.length) { r.alta++; if (Math.round(alta.reduce((a: number, i: any) => a + (i.qtd || 0), 0)) !== esp) { r.altaErrada++; r.erradas.push(`${S.nome} · camada ${L}`); } }
+    }
+    for (const [L, esp] of Object.entries<number>(S.metros)) {
+      r.metros++; const its = daCamada(L).filter((i: any) => i.tipo === 'ROTA'); const soma = its.reduce((a: number, i: any) => a + (i.qtd || 0), 0);
+      if (Math.abs(soma - esp) <= 0.02 * esp) r.metrosExatos++; else r.detalhe.push(`${S.nome} · camada ${L} · gabarito ${esp} m · motor ${soma.toFixed(2)} m`);
+      const alta = its.filter((i: any) => i.conf === 'ALTA');
+      if (alta.length && Math.abs(alta.reduce((a: number, i: any) => a + (i.qtd || 0), 0) - esp) > 0.02 * esp) { r.altaErrada++; r.erradas.push(`${S.nome} · camada ${L} (m)`); }
+    }
+    return r;
+  }
+  const usados = new Set<number>();
+  for (const g of S.itens!) {
+    r.itens++;
+    let k = -1;
+    if (S.modo === 'nome') k = pred.findIndex((p: any, i: number) => !usados.has(i) && norm(p.nome).slice(0, 24) === norm(g.texto).slice(0, 24));
+    else { let melhor = 0; pred.forEach((p: any, i: number) => { if (usados.has(i) || !p.bbox) return; const v = Math.max(iou(g.icone, p.bbox), perto(g.icone, p.bbox) && perto(p.bbox, g.icone) ? 0.5 : 0); if (v > melhor) { melhor = v; k = i; } }); if (melhor < 0.3) k = -1; }
+    const it = k >= 0 ? pred[k] : null; if (it) usados.add(k);
+    const pego = new Set<string>(); let fp = 0;
+    for (const m of it ? it.marcas : []) {
+      let d0 = Infinity, chave = '', dono: any = null;
+      S.itens!.forEach((gg: any, gi: number) => gg.pontos.forEach((p: number[], pi: number) => { const d = Math.hypot(p[0] - m[0], p[1] - m[1]); if (d < d0) { d0 = d; chave = gi + ':' + pi; dono = gg; } }));
+      if (d0 <= Math.max(6, 0.75 * m[2]) && dono === g && !pego.has(chave)) pego.add(chave); else fp++;
+    }
+    const q = it ? it.qtd : null, certo = q === g.n && fp === 0;
+    if (certo) r.exatos++; else r.detalhe.push(`${S.nome} · ${g.texto.slice(0, 36)} · gabarito ${g.n} · motor ${q == null ? (it ? '—' : 'SUMIU') : q}${fp ? ` · ${fp} marca(s) fora do lugar` : ''}`);
+    if (it && it.conf === 'ALTA') { r.alta++; if (!certo) { r.altaErrada++; r.erradas.push(`${S.nome} · ${g.texto.slice(0, 36)} · gabarito ${g.n} · motor ${q}`); } }
+  }
+  return r;
+}
+
+async function contagem(): Promise<boolean> {
+  const quais = (process.env.SET || 'normal,dificil,lote,sinteticas').split(',');
+  const L = alvos(quais), t0 = Date.now();
+  const T: Record<string, any> = {}, erradas: string[] = [], detalhes: string[] = [], quebradas: string[] = [];
+  await emParalelo(L, async (S) => {
+    const out = await rodar([S.pdf]);
+    if (out.erro) { quebradas.push(`${S.nome}: ${out.erro}`); return; }
+    const r = julgar(S, out.folhas);
+    const a = (T[S.set] = T[S.set] || { folhas: 0, itens: 0, exatos: 0, alta: 0, altaErrada: 0, metros: 0, metrosExatos: 0 });
+    a.folhas++; for (const c of ['itens', 'exatos', 'alta', 'altaErrada', 'metros', 'metrosExatos']) a[c] += (r as any)[c];
+    erradas.push(...r.erradas); detalhes.push(...r.detalhe);
+  });
+  const pct = (a: number, b: number) => (b ? ((100 * a) / b).toFixed(1) + '%' : '—');
+  console.log('\nCONTAGEM — itens com a quantidade exata, cada marca sobre uma ocorrência real\n');
+  console.log('conjunto'.padEnd(14) + ['folhas', 'itens', 'exatos', '%', 'confirmados', 'confirm. errados'].map((c) => c.padStart(17)).join(''));
+  const tot = { folhas: 0, itens: 0, exatos: 0, alta: 0, altaErrada: 0, metros: 0, metrosExatos: 0 };
+  for (const k of ['normal', 'dificil', 'lote', 'sinteticas']) {
+    const a = T[k]; if (!a) continue;
+    console.log(k.padEnd(14) + [a.folhas, a.itens, a.exatos, pct(a.exatos, a.itens), a.alta, a.altaErrada].map((c) => String(c).padStart(17)).join(''));
+    for (const c of Object.keys(tot)) (tot as any)[c] += a[c];
+  }
+  console.log('TODOS'.padEnd(14) + [tot.folhas, tot.itens, tot.exatos, pct(tot.exatos, tot.itens), tot.alta, tot.altaErrada].map((c) => String(c).padStart(17)).join(''));
+  if (tot.metros) console.log(`\nmetros de rota (a até 2%): ${tot.metrosExatos}/${tot.metros}`);
+  if (process.env.V && detalhes.length) { console.log(`\nnão exatos (${detalhes.length}):`); detalhes.sort().forEach((d) => console.log('  ' + d)); }
+  if (quebradas.length) { console.log('\nquebraram o motor:'); quebradas.forEach((q) => console.log('  ' + q)); }
+  console.log(`\n(${((Date.now() - t0) / 1000).toFixed(0)} s)`);
+  let ok = true;
+  const cheio = quais.length === 4;
+  if (erradas.length > META.altaErrada) { ok = false; console.log(`\nFALHOU: ${erradas.length} quantidade(s) CONFIRMADA(S) errada(s) — o teto é 0:`); erradas.forEach((e) => console.log('  ' + e)); }
+  if (cheio && tot.exatos / tot.itens < META.pecas) { ok = false; console.log(`\nFALHOU: ${pct(tot.exatos, tot.itens)} de itens exatos — a meta é ${META.pecas * 100}%`); }
+  if (quebradas.length) ok = false;
+  return ok;
+}
+
+// ---------------- LEGENDA (80 folhas inéditas) ----------------
+function lev(a: string, b: string) { const m = a.length, n = b.length; if (!m) return n; if (!n) return m; let p = Array.from({ length: n + 1 }, (_, j) => j); for (let i = 1; i <= m; i++) { const c = [i]; for (let j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[n]; }
+const normT = (t: string) => (t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
+const sim = (a: string, b: string) => { a = normT(a); b = normT(b); return 1 - lev(a, b) / Math.max(1, a.length, b.length); };
+async function legenda(): Promise<boolean> {
+  const GT = JSON.parse(fs.readFileSync(path.join(B, 'legenda', 'gt.json'), 'utf8'));
+  let gt = 0, predN = 0, hit = 0, txt = 0, perfeitas = 0, n = 0; const t0 = Date.now();
+  await emParalelo(GT, async (g: any) => {
+    const out = await rodar([path.join(B, 'legenda', g.file)]);
+    n++; gt += g.items.length; if (out.erro) return;
+    const pred = out.folhas[0].itens.map((it: any) => ({ name: it.nome, b: it.bbox }));
+    const usados = new Set<number>(); let h = 0, t = 0;
+    for (const gi of g.items) {
+      let best = -1, bs = 0;
+      pred.forEach((p: any, k: number) => { if (usados.has(k)) return; const v = Math.max(iou(gi.icon, p.b), perto(gi.icon, p.b, 2) && perto(p.b, gi.icon, 2) ? 0.5 : 0); if (v > bs) { bs = v; best = k; } });
+      if (best >= 0 && bs >= 0.3) { usados.add(best); h++; if (sim(gi.text, pred[best].name) >= 0.9) t++; }
+    }
+    predN += pred.length; hit += h; txt += t; if (h === g.items.length && pred.length === g.items.length && t === g.items.length) perfeitas++;
+  });
+  console.log(`\nLEGENDA — ${n} folhas que o motor nunca viu`);
+  console.log(`achou ${((100 * hit) / gt).toFixed(0)}% dos itens · ${predN ? ((100 * hit) / predN).toFixed(0) : 0}% do que entregou é item de verdade · texto certo ${((100 * txt) / gt).toFixed(0)}% · folhas perfeitas ${perfeitas}/${n}  (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
+  if (perfeitas < META.legendaPerfeitas) { console.log(`FALHOU: ${perfeitas} folhas perfeitas — o piso é ${META.legendaPerfeitas}`); return false; }
+  return true;
+}
+
+// ---------------- LISTA DE COMPRA em pranchas públicas reais ----------------
+async function lista(): Promise<boolean | null> {
+  const DIR = process.env.PLANS_EXT || path.join(RAIZ, 'plans-externas');
+  if (!fs.existsSync(DIR)) { console.log(`\nLISTA — pulada: não achei as pranchas públicas em ${DIR} (descompacte plans-externas.zip na raiz)`); return null; }
+  const F = JSON.parse(fs.readFileSync(path.join(B, 'legenda-publicas.json'), 'utf8'));
+  const fora = F.erros_conhecidos.concat(F.pesadas_fora || []);
+  const log = console.log; console.log = () => {}; const pdfjs = require('pdfjs-dist/legacy/build/pdf.js'); console.log = log;
+  const tarefas: { f: string; p: number }[] = [];
+  for (const f of fs.readdirSync(DIR).filter((f) => f.endsWith('.pdf')).sort()) {
+    if (fora.includes(f.replace('.pdf', ''))) continue;
+    const d = await pdfjs.getDocument({ data: new Uint8Array(fs.readFileSync(path.join(DIR, f))), verbosity: 0 }).promise;
+    for (let p = 1; p <= d.numPages; p++) tarefas.push({ f, p });
+    await d.destroy();
+  }
+  const entregue: any[] = [], erros: string[] = []; const t0 = Date.now();
+  await emParalelo(tarefas, async (t) => {
+    const out = await rodar([path.join(DIR, t.f), String(t.p)]);
+    if (out.erro) { erros.push(`${t.f} p.${t.p}: ${out.erro}`); return; }
+    let vazias = 0;
+    for (const fo of out.folhas) for (const it of fo.itens) entregue.push({ arquivo: t.f.replace('.pdf', ''), pagina: fo.pagina, texto: it.nome || '(sem descrição #' + ++vazias + ')', status: it.conf, qtd: it.qtd });
+  });
+  const chave = (x: any) => `${x.arquivo} · p.${x.pagina} · ${x.texto}`;
+  const julgado = new Map<string, any>(F.entregas.map((x: any) => [chave(x), x]));
+  let mat = 0, lixo = 0; const lixoAlta: string[] = [];
+  for (const x of entregue) { const j = julgado.get(chave(x)); if (!j) continue; if (j.material) mat++; else { lixo++; if (x.status === 'ALTA' && !/^\(sem descrição/.test(x.texto)) lixoAlta.push(`${chave(x)} · ${x.qtd}`); } }
+  console.log(`\nLISTA DE COMPRA — ${tarefas.length} folhas de pranchas públicas reais`);
+  console.log(`${mat} descrições de material · ${lixo} de lixo (texto que não é material) · lixo CONFIRMADO: ${lixoAlta.length}  (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
+  if (erros.length) { console.log('quebraram:'); erros.forEach((e) => console.log('  ' + e)); }
+  if (lixoAlta.length > META.lixoAlta) { console.log('FALHOU: lixo saindo como confirmado:'); lixoAlta.forEach((l) => console.log('  ' + l)); return false; }
+  return !erros.length;
+}
+
+// ---------------- principal ----------------
+async function main() {
+  if (process.argv[2] === '--um') return filho(process.argv[3], process.argv[4]);
+  const qual = process.argv[2] || 'tudo';
+  const r: (boolean | null)[] = [];
+  if (qual === 'tudo' || qual === 'contagem') r.push(await contagem());
+  if (qual === 'tudo' || qual === 'legenda') r.push(await legenda());
+  if (qual === 'tudo' || qual === 'lista') r.push(await lista());
+  if (r.some((x) => x === false)) { console.log('\n✗ algum portão falhou'); process.exit(1); }
+  console.log('\n✓ portões verdes');
+}
+main().catch((e) => { console.error(e); process.exit(3); });

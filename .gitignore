@@ -1,0 +1,5 @@
+node_modules/
+dist/
+/bench/pdf2
+/plans-externas
+*.log

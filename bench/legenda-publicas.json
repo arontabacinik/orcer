@@ -1,0 +1,1854 @@
+{
+ "_": "Tudo que a v2 entrega nas pranchas PÚBLICAS de plans-externas, julgado à mão uma vez, com a pergunta que qualquer pessoa confere: isto é uma linha de lista de compra? Carimbo, data, número de prancha, rótulo de circuito, nota e fragmento de frase não são.",
+ "__como_funciona": "O portão compara CONJUNTOS: descrição nova que ninguém julgou derruba, descrição julgada que sumiu derruba, e lixo com status ALTA tem teto 0. Consertar um lixo é editar este arquivo — ganho registrado, não portão quebrado.",
+ "__origem": "106 descrições herdaram o julgamento à mão do Orcer v1 (fixtures/precisao.json); as demais foram julgadas em 24/09/2026. As 115 que a frente da legenda removeu eram todas lixo — nota, carimbo, fragmento de frase e texto de fonte sem mapa Unicode.",
+ "erros_conhecidos": [
+  "gov-joinville"
+ ],
+ "entregas": [
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "Caixa de medição embutir a 1,50m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "Entrada de serviço aérea",
+   "material": true
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "Interruptor simples 1 tecla - 1,10m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "Projetor p/ lâmp. multivapor metálico tubular - sobrepor teto",
+   "material": true
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "Quadro de distribuição - embutir a 1,50m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "Tomada - 2P+T 10 A a 0,30m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "gov-piscina",
+   "pagina": 1,
+   "texto": "Interruptor simples 1 tecla - 1,10m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "gov-piscina",
+   "pagina": 1,
+   "texto": "Luminária spot p/ fluor. compacta simples - embutir",
+   "material": true
+  },
+  {
+   "arquivo": "gov-piscina",
+   "pagina": 1,
+   "texto": "Caixa de medição embutir a 1,60m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "gov-piscina",
+   "pagina": 1,
+   "texto": "Caixa de passagem de embutir no piso",
+   "material": true
+  },
+  {
+   "arquivo": "gov-piscina",
+   "pagina": 1,
+   "texto": "Luminária p/ lâmp. mista - sobrepor teto",
+   "material": true
+  },
+  {
+   "arquivo": "gov-piscina",
+   "pagina": 1,
+   "texto": "Ponto 3P+T a 0,30m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "gov-piscina",
+   "pagina": 1,
+   "texto": "Quadro de distribuição - embutir a 1,50m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "gov-piscina",
+   "pagina": 1,
+   "texto": "Y - Potência da Luminária Z - N° de Luminárias",
+   "material": false
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Tomada Média (H=110cm)",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Tomada Alta (Chuveiro)",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Lógica (H=110cm)",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Arandela Média (H=140cm)",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Ponto de Iluminação no Teto",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Ponto Água Fria (H= 60cm)",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Ponto Esgoto Lavatório / Tanque (H= 50cm)",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Ponto Esgoto Pia (H= 50cm)",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Vaso Sanitário Caixa Acoplada*",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Chuveiro",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Ralo / Caixa Sifonada",
+   "material": true
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "Registro Gaveta (H=190cm)",
+   "material": true
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "(sem descrição #1)",
+   "material": false
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "3. Todos os quadros de distribuição deverão possuir barramentos independentes para neutro, fases e terra, ligados conforme diagrama unifilar; 4. Não é permitido utilização do condutor neutro como condutor de proteção (terra); 5. Nos circuitos monofásicos não é permitido a redução do diâmetro do condutor neutro nem sua utilização conjunta para outros",
+   "material": false
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "(sem descrição #2)",
+   "material": false
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "(sem descrição #3)",
+   "material": false
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "ELÉTRICOS E RISCO DE VIDA PARA OS USUÁRIOS DA INSTALAÇÃO.",
+   "material": false
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "1 tecla simples & 1 tomada - 1,10m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "Interruptor simples 1 tecla - 1,10m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "Interruptor simples 2 teclas - 1,10m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "Luminária p/ lâmp. fluor. tubular - sobrepor",
+   "material": true
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "Quadro de distribuição - embutir a 1,50m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "Tomada hexagonal (NBR 14136) - 2P+T 20 A a 0,30m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "Tomada hexagonal (NBR 14136) - 2P+T 20 A a 2,20m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "Tomada hexagonal (NBR 14136) - 2P+T 20 A a 1,10m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 2,
+   "texto": "(sem descrição #1)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 2,
+   "texto": "(sem descrição #2)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 2,
+   "texto": "(sem descrição #3)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 2,
+   "texto": "(sem descrição #4)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 2,
+   "texto": "(sem descrição #5)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 2,
+   "texto": "(sem descrição #6)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 2,
+   "texto": "Relé fotoelétrico, 1000W/220V/60Hz.",
+   "material": true
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 2,
+   "texto": "(sem descrição #7)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 3,
+   "texto": "(sem descrição #1)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 3,
+   "texto": "(sem descrição #2)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 3,
+   "texto": "(sem descrição #3)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 3,
+   "texto": "(sem descrição #4)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 3,
+   "texto": "(sem descrição #5)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 3,
+   "texto": "(sem descrição #6)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 3,
+   "texto": "Relé fotoelétrico, 1000W/220V/60Hz.",
+   "material": true
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 3,
+   "texto": "(sem descrição #7)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #1)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #2)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #3)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #4)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #5)",
+   "material": false
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #6)",
+   "material": false
+  },
+  {
+   "arquivo": "pub24",
+   "pagina": 1,
+   "texto": "(sem descrição #1)",
+   "material": false
+  },
+  {
+   "arquivo": "pub25",
+   "pagina": 1,
+   "texto": "LINHADE CORTE",
+   "material": false
+  },
+  {
+   "arquivo": "pub25",
+   "pagina": 1,
+   "texto": "LINHA DE PROJEÇÃO",
+   "material": false
+  },
+  {
+   "arquivo": "pub32",
+   "pagina": 1,
+   "texto": "Caixa de medição embutir para medidor monofásico - CM-1",
+   "material": true
+  },
+  {
+   "arquivo": "pub32",
+   "pagina": 1,
+   "texto": "Entrada de serviço aérea",
+   "material": true
+  },
+  {
+   "arquivo": "pub32",
+   "pagina": 1,
+   "texto": "Interruptor simples 1 tecla - 1,10m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub32",
+   "pagina": 1,
+   "texto": "Quadro de distribuição - embutir a 1,50m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub32",
+   "pagina": 1,
+   "texto": "Spot embutir no chão",
+   "material": true
+  },
+  {
+   "arquivo": "pub32",
+   "pagina": 1,
+   "texto": "Tomada 2P+T",
+   "material": true
+  },
+  {
+   "arquivo": "pub32",
+   "pagina": 1,
+   "texto": "Tomada hexagonal (NBR 14136) - 2P+T 10 A",
+   "material": true
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "POSTE DE CONCRETO EXISTENTE",
+   "material": true
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "(sem descrição #1)",
+   "material": false
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "(sem descrição #2)",
+   "material": false
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "(sem descrição #3)",
+   "material": false
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "CAIXA DE COMANDO PROJETADA",
+   "material": true
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "SEM ESCALA",
+   "material": false
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "05 UNIDADES",
+   "material": false
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "ELETRODUTO ',Æ0(752\u0003 EXTERNO",
+   "material": false
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "(sem descrição #4)",
+   "material": false
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "QUADRO DE CARGAS",
+   "material": false
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "HASTE DE TERRA",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Tomada Baixa 2P+T, 10A, a 30cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Tomada Média 2P+T, 10A, a 110cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Tomada Alta 2P+T, 10A, a 210cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Tomada Baixa 2P+T, 20A, a 30cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Tomada Média 2P+T, 20A, a 110cm do piso , embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Tomada Alta 2P+T, 20A, a 210cm do piso , embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Tomada Trifásica",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Ponto de Força com placa saída de fio, a 220cm do piso acabado, exceto quando indicado",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Interruptor simples de uma seção, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Conjunto de 2 Interruptores simples, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Conjunto de 3 Interruptores simples, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Interruptor paralelo (three-way), embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Condutores Neutro, Fase, Terra e Retorno, respectivamente",
+   "material": false
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Ponto de luz na parede a 210cm do piso acabado",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Ponto de luz na parede de sobrepor (Ver altura em planta)",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Quadro de Distribuição de luz e força embutido a 150cm do piso acabado",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Eletroduto embutido no teto ou parede (Ver especificação em planta)",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Eletroduto que sobe",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Eletroduto que desce",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Eletroduto que passa descendo",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Eletroduto que passa subindo",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Tomada Baixa 2P+T, 10A, a 30cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Tomada Média 2P+T, 10A, a 110cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Tomada Alta 2P+T, 10A, a 210cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Tomada Baixa 2P+T, 20A, a 30cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Tomada Média 2P+T, 20A, a 110cm do piso , embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Tomada Alta 2P+T, 20A, a 210cm do piso , embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Tomada Trifásica",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Ponto de Força com placa saída de fio, a 220cm do piso acabado, exceto quando indicado",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Interruptor simples de uma seção, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Conjunto de 2 Interruptores simples, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Conjunto de 3 Interruptores simples, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Interruptor paralelo (three-way), embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Condutores Neutro, Fase, Terra e Retorno, respectivamente",
+   "material": false
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Ponto de luz na parede a 210cm do piso acabado",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Ponto de luz na parede de sobrepor (Ver altura em planta)",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Quadro de Distribuição de luz e força embutido a 150cm do piso acabado",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Eletroduto embutido no teto ou parede (Ver especificação em planta)",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Eletroduto que sobe",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Eletroduto que desce",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Eletroduto que passa descendo",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Eletroduto que passa subindo",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Ponto de Dados, RJ45, a 30cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Ponto de Dados, RJ45, a 110cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "(sem descrição #1)",
+   "material": false
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Caixa de passagem no piso (Ver especificação em planta)",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Eletroduto embutido no teto ou na parede",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "(sem descrição #2)",
+   "material": false
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Eletroduto que sobe",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Eletroduto que desce",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Eletroduto que passa descendo",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Eletroduto que passa subindo",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Ponto de Dados, RJ45, a 30cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Ponto de Dados, RJ45, a 110cm do piso, embutido em caixa 4x2\"",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "(sem descrição #1)",
+   "material": false
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Caixa de passagem no piso (Ver especificação em planta)",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Eletroduto embutido no teto ou na parede",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "(sem descrição #2)",
+   "material": false
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "(sem descrição #3)",
+   "material": false
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "(sem descrição #4)",
+   "material": false
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Eletroduto que sobe",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Eletroduto que desce",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Eletroduto que passa descendo",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Eletroduto que passa subindo",
+   "material": false,
+   "motivo": "re-julgado em 26/09/2026 (v3, F3): as 16 fileiras \"Eletroduto que sobe / desce / passa subindo / passa descendo\" da pub5 são a MESMA classe — convenção de desenho (símbolo de subida/descida, NBR 5444), não linha de compra; o eletroduto se compra pelo trecho. Antes \"que sobe\" estava julgado material e as outras três lixo."
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "- PATCH PANNEL 24P CAT.5e, REF. FURUKAWA OU",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "- SWITCH 24 PORTAS, REF. FURUKAWA OU SIMILAR.",
+   "material": true
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "- RÉGUA DE TOMADAS, REF. FURUKAWA OU SIMILAR.",
+   "material": true
+  },
+  {
+   "arquivo": "pub8",
+   "pagina": 1,
+   "texto": "LÂMPADA SIMPLES",
+   "material": true
+  },
+  {
+   "arquivo": "pub8",
+   "pagina": 1,
+   "texto": "TOMADA MÉDIA (h=120cm)",
+   "material": true
+  },
+  {
+   "arquivo": "pub8",
+   "pagina": 1,
+   "texto": "TOMADA ALTA (h=220cm)",
+   "material": true
+  },
+  {
+   "arquivo": "pub8",
+   "pagina": 1,
+   "texto": "TOMADA DE USO ESPECÍFICO (h=220cm)",
+   "material": true
+  },
+  {
+   "arquivo": "pub8",
+   "pagina": 1,
+   "texto": "INTERRUPTOR 1 TECLA SIMPLES",
+   "material": true
+  },
+  {
+   "arquivo": "pub8",
+   "pagina": 1,
+   "texto": "INTERRUPTOR 3 TECLAS SIMPLES",
+   "material": true
+  },
+  {
+   "arquivo": "pub8",
+   "pagina": 1,
+   "texto": "QUADRO DE DISTRIBUIÇÃO",
+   "material": true
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "(sem descrição #1)",
+   "material": false
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "Eletroduto rígido roscável, PVC para rede enterrada (DN - INDICADO EM PLANTA) Caixa enterrada elétrica retangular, em alvenaria,",
+   "material": true
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "CONCRETO DENTRO DAS",
+   "material": false
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "JARDINEIRAS.",
+   "material": false
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Eletroduto pela parede ou entreforro",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Perfilado (eletrocalha) em aço no entreforro",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Eletroduto corrugado PEAD (Kanaflex) pelo piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Tomada (NBR 14136) - 2P+T 10 A a 0,30m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Tomada (NBR 14136) - 2P+T 10 A a 1,10m do piso Tomada (NBR 14136) - 2P+T 10 A no piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Bloco autônomo sinal. emergência a 2,20m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Caixa de medição sobrepor a 1,50m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Caixa de passagem de embutir na parede",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Cotovelo reto 90°",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Entrada de serviço aérea",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Interruptor fotoelétrico",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Interruptor paralelo 1 tecla - 1,10m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Interruptor simples 1 tecla - 1,10m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub21",
+   "pagina": 1,
+   "texto": "Interruptor simples 2 teclas - 1,10m do piso",
+   "material": true
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "8. As emendas dos condutores só são permitidas nas caixas e deverão ser executadas por meio de conectores apropriados ou por solda. Deverão ser perfeitamente isoladas utilizando-se fita auto-fusão e sobre esta, fita isolante; 9. Os materiais a serem utilizados deverão atender as normas NBR e possuir selo do INMETRO;",
+   "material": false,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nota numerada"
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "2. Da mesma forma, NUNCA desative ou remova a chave automática de proteção contra choques elétricos (dispositivo DR), mesmo em",
+   "material": false,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nota numerada"
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "Luminária LED 50W",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 2,
+   "texto": "30, 130 e 220cm do piso acabado.",
+   "material": false,
+   "motivo": "julgado em 26/09/2026 (v3, F3): fragmento (rabo de descrição)"
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 3,
+   "texto": "30, 130 e 220cm do piso acabado.",
+   "material": false,
+   "motivo": "julgado em 26/09/2026 (v3, F3): fragmento (rabo de descrição)"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "Entrada de energia padrão CELPE com medição no poste e caixa de disjuntores abrigado em parede de alvenaria.",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "Poste de aço galvanizado cônico contínuo reto, altura total 6m p/ duas luminárias de LED 150W.",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "Poste de aço decorativo com rebatedor circular, altura total 3m c/ luminária de LED 150W.",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "Refletor slim de LED de 50w instalado conforme detalhe e locais em planta.",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "Tipos de condutores ( Fase, Neutro e terra) distribuidos conforme planta.",
+   "material": false,
+   "motivo": "julgado em 26/09/2026 (v3, F3): convenção de tipo de condutor, como a versão curta desta linha já julgada lixo"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "Aterramento individual em poste de acordo com a norma, distribuidos conforme planta.",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "REFLETOR SLIM DE 50W INSTALADO EM BASE DE",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Tomada de Piso ou Teto (Ver indicação em planta) 2P+T, 10A, embutido em caixa 4x2\"",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Tomada de Piso ou Teto (Ver indicação em planta) 2P+T, 20A, embutido em caixa 4x2\"",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Eletroduto embutido no piso ou enterrado (Ver especificação em planta)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Entrada de energia (Material: Flexível corrugado em PEAD, diâmetro indicado em planta)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Distribuição à instalar (Material: Rígido de PVC branco antichamas, Ø3/4\" ou indicado)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Distribuição (Material: Flexível corrugado de PVC amarelo antichamas, Ø3/4\" ou indicado)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Tomada de Piso ou Teto (Ver indicação em planta) 2P+T, 10A, embutido em caixa 4x2\"",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Tomada de Piso ou Teto (Ver indicação em planta) 2P+T, 20A, embutido em caixa 4x2\"",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Eletroduto embutido no piso ou enterrado (Ver especificação em planta)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Entrada de energia (Material: Flexível corrugado em PEAD, diâmetro indicado em planta)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Distribuição à instalar (Material: Rígido de PVC branco antichamas, Ø3/4\" ou indicado)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Distribuição (Material: Flexível corrugado de PVC amarelo antichamas, Ø3/4\" ou indicado)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Ponto de Dados, RJ45, a 220cm do piso, embutido em caixa 4x2\"",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Quadro de VDI, de embutir, em PVC antichama (Tamanho indicado em planta)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Eletroduto embutido no piso ou enterrado (Ver especificação em planta)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Entrada de telecomunicações (Material: Flexível corrugado em PEAD, diâmetro indicado em planta) Eletroduto para sistema de Dados (Material: Rígido de PVC branco",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Ponto de Dados, RJ45, a 220cm do piso, embutido em caixa 4x2\"",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Quadro de VDI, de embutir, em PVC antichama (Tamanho indicado em planta)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Eletroduto embutido no piso ou enterrado (Ver especificação em planta)",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Entrada de telecomunicações (Material: Flexível corrugado em PEAD, diâmetro indicado em planta) Eletroduto para sistema de Dados (Material: Rígido de PVC branco",
+   "material": true,
+   "motivo": "julgado em 26/09/2026 (v3, F3): nomeia material"
+  }
+ ],
+ "pesadas_fora": [
+  "pub23"
+ ],
+ "__pesadas_fora": "pub23 fica fora da régua: a página 3 dela é A0 de 2384x1684 pt e leva mais de 20 min só nela — é o gargalo de desempenho medido, não um defeito de legenda. Uma folha em 62. Rode com TENTAR=1 para incluí-la.",
+ "retiradas_v3": [
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "1 (ILUMINAÇÃO DIR)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "2 (ILUMINAÇÃO ESQ)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "3 (TOMADAS DIR)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "4 (TOMADA ESQ)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "ILUMINAÇÃO DIR",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "ILUMINAÇÃO ESQ",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "TOMADAS DIR",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "ind41",
+   "pagina": 1,
+   "texto": "TOMADA ESQ",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "CONFERIR MEDIDAS NO LOCAL - O ARQUITETO NÃO",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "exemplo1",
+   "pagina": 1,
+   "texto": "SE RESPONSABILIZA POR ERROS DE EXECUÇÃO",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "(sem descrição #4)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub11",
+   "pagina": 1,
+   "texto": "(sem descrição #5)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "Não fazer redução de seção transversal de condutores (neutro, \"retorno\", etc) se não houver indicação em",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #7)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "QD QUADRA REMOVER",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #8)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #9)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #10)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "Remover quadro, instalar caixa de passagem metálica 20x20cm e",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub2",
+   "pagina": 1,
+   "texto": "(sem descrição #11)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub32",
+   "pagina": 1,
+   "texto": "1 (CHUVEIRO)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub32",
+   "pagina": 1,
+   "texto": "2 (DORMITÓRIOS E BANHEIRO)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub32",
+   "pagina": 1,
+   "texto": "3 (SALA E COZINHA)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "(sem descrição #5)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub4",
+   "pagina": 1,
+   "texto": "ELETRODUTO KANAFLEX DE PEAD (POLIETILENO DE ALTA DENSIDADE), &\u0012\u0003(;&(/(17(\u00035$,2\u0003'(\u0003&859$785$\u000f\u0003,03(50(È9(/\u000f\u0003',Æ0(752\u0003,1',&$'2",
+   "material": true,
+   "motivo": "não é fileira de legenda: texto da planta (metade em fonte sem mapa Unicode) que a v2 ancorava num traço a 526 pt — 71 alturas de linha"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "(sem descrição #1)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "(sem descrição #2)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Eletroduto embutido no piso ou enterrado (Ver especificação em planta) Entrada de energia (Material: Flexível corrugado em PEAD, diâmetro",
+   "material": true,
+   "motivo": "a v2 FUNDIA duas fileiras numa descrição só; a v3 entrega as duas separadas"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "(sem descrição #3)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "Ø3/4\" ou indicado) Distribuição (Material: Flexível corrugado de PVC amarelo antichamas,",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 1,
+   "texto": "(sem descrição #4)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "(sem descrição #1)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "(sem descrição #2)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Eletroduto embutido no piso ou enterrado (Ver especificação em planta) Entrada de energia (Material: Flexível corrugado em PEAD, diâmetro",
+   "material": true,
+   "motivo": "a v2 FUNDIA duas fileiras numa descrição só; a v3 entrega as duas separadas"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "(sem descrição #3)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "Ø3/4\" ou indicado) Distribuição (Material: Flexível corrugado de PVC amarelo antichamas,",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 2,
+   "texto": "(sem descrição #4)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Ponto de Dados, RJ45, a 220cm do piso, embutido em caixa 4x2\" Quadro de VDI, de embutir, em PVC antichama (Tamanho indicado em",
+   "material": true,
+   "motivo": "a v2 FUNDIA duas fileiras numa descrição só; a v3 entrega as duas separadas"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "Eletroduto embutido no piso ou enterrado (Ver especificação em planta) Entrada de telecomunicações (Material: Flexível corrugado em PEAD,",
+   "material": true,
+   "motivo": "a v2 FUNDIA duas fileiras numa descrição só; a v3 entrega as duas separadas"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "(sem descrição #3)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 3,
+   "texto": "(sem descrição #4)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Ponto de Dados, RJ45, a 220cm do piso, embutido em caixa 4x2\" Quadro de VDI, de embutir, em PVC antichama (Tamanho indicado em",
+   "material": true,
+   "motivo": "a v2 FUNDIA duas fileiras numa descrição só; a v3 entrega as duas separadas"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "Eletroduto embutido no piso ou enterrado (Ver especificação em planta) Entrada de telecomunicações (Material: Flexível corrugado em PEAD,",
+   "material": true,
+   "motivo": "a v2 FUNDIA duas fileiras numa descrição só; a v3 entrega as duas separadas"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "2xUTP/4P/CAT.6 PT024 PT025",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "4xUTP/4P/CAT.6",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub5",
+   "pagina": 4,
+   "texto": "RACK",
+   "material": true,
+   "motivo": "rótulo do rack NA PLANTA, lido junto com rótulos de cabo (\"4xUTP/4P/CAT.6\") num bloco de 2 linhas cujos desenhos não estão na coluna de ícones da legenda; o resgate da v3 recusa esse bloco. A lista do rack (patch panel, switch, régua) continua entregue"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "(sem descrição #2)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "(sem descrição #3)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "(sem descrição #4)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "(sem descrição #5)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "Tipos de condutores ( Fase, Neutro e terra)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "(sem descrição #6)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "(sem descrição #7)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "REFLETOR SLIM DE 50W",
+   "material": true,
+   "motivo": "a v3 entrega a mesma chamada inteira: \"REFLETOR SLIM DE 50W INSTALADO EM BASE DE\""
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "INSTALADO EM BASE DE",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "QUE VÊM DA CAIXA DE INSPEÇÃO",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "COM CABEAMENTO ENTERRADO.",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "(sem descrição #8)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "NA ESPESSURA MÍNIMA DE 10cm.",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "POSTE C/ 6.00M DE ALTURA",
+   "material": true,
+   "motivo": "chamada de DETALHE, não fileira de legenda; a v3 lê a tabela de legenda da folha, que traz \"Poste de aço galvanizado cônico contínuo reto, altura total 6m…\""
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "E DUAS LUMINÁRIAS DE LED 150W.",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "SUPORTE DE FIXAÇÃO EM CHAPA DE",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "AÇO GALVANIZADO, PARA ACOPLAR",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "02 LUMINÁRIAS DE LED 150W CADA,",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "ENCAIXE EM POSTE RETO COM TOPO DE Ø = 60,3MM EXTERNO.",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "2x150W P-2",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "CX-3",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "(sem descrição #9)",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "3.00M DE ALTURA E",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "ELETRODUTO RÍGIDO QUE",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "SOBE P/ LIGAÇÃO DAS",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "LUMINÁRIAS (NO MÍNIMO",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "50CM DENTRO DO POSTE.",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "ELETRODUTO FLEXÍVEL Ø 3/4\"",
+   "material": true,
+   "motivo": "chamada do detalhe de aterramento (\"…de ligação do fio terra ao poste\"), não fileira de legenda; a v2 a lia junto com uns 30 fragmentos de frase do mesmo detalhe, todos lixo"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "DE LIGAÇÃO DO FIO TERRA AO",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "POSTE.",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "TAMPA EM CONCRETO",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "ESP. = 7cm.",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  },
+  {
+   "arquivo": "pub1",
+   "pagina": 1,
+   "texto": "SEGUE P/ LIGAÇÃO DOS DEMAIS POSTES.",
+   "material": false,
+   "motivo": "lixo que a v3 deixou de entregar"
+  }
+ ],
+ "__retiradas_v3": "Descrições julgadas que a v3 deixou de entregar, com o motivo. Lixo que some é ganho; material que some só sai daqui com a razão escrita."
+}

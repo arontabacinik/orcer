@@ -1,0 +1,62 @@
+{
+ "arquivo": "./fixtures/sintetica-alturas.pdf",
+ "paginas": 1,
+ "rotacao": 0,
+ "pagina": [
+  595,
+  842
+ ],
+ "legenda_em": "baixo",
+ "forma_da_legenda": "alturas",
+ "lixo_na_camada": false,
+ "camadas_mudas": false,
+ "cor_unica": false,
+ "fonte": [
+  "helv",
+  "hebo"
+ ],
+ "itens": 6,
+ "esperado": [
+  [
+   "RECEPTACLE 2P+E 20A, WALL MOUNTED, NEW",
+   "E-OUTLET",
+   17
+  ],
+  [
+   "LIGHT FIXTURE LED 2X18W SURFACE MOUNTED, NEW",
+   "E-FIXTURE",
+   23
+  ],
+  [
+   "SWITCH SINGLE POLE 10A, WALL MOUNTED, NEW",
+   "E-SWITCH",
+   6
+  ],
+  [
+   "DISTRIBUTION PANEL BOARD, SURFACE MOUNTED, NEW",
+   "E-PANEL",
+   2
+  ]
+ ],
+ "sem_fonte": [],
+ "sem_camada": [],
+ "quadro": [],
+ "cargas": [],
+ "por_cor": [],
+ "nao_e_item": [],
+ "contagens": {
+  "E-OUTLET": 17,
+  "E-FIXTURE": 23,
+  "E-SWITCH": 6,
+  "E-PANEL": 2
+ },
+ "escala": 50,
+ "comprimentos_pt": {
+  "E-CONDUIT": 3520.0,
+  "E-TRAY": 920.0
+ },
+ "comprimentos_m": {
+  "E-CONDUIT": 62.09,
+  "E-TRAY": 16.23
+ }
+}

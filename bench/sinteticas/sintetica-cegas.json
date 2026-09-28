@@ -1,0 +1,62 @@
+{
+ "arquivo": "./fixtures/sintetica-cegas.pdf",
+ "paginas": 1,
+ "rotacao": 0,
+ "pagina": [
+  595,
+  842
+ ],
+ "legenda_em": "baixo",
+ "forma_da_legenda": "cegas",
+ "lixo_na_camada": false,
+ "camadas_mudas": true,
+ "cor_unica": true,
+ "fonte": [
+  "helv",
+  "hebo"
+ ],
+ "itens": 6,
+ "esperado": [
+  [
+   "RECEPTACLE 2P+E 20A, WALL MOUNTED, NEW",
+   "L03",
+   17
+  ],
+  [
+   "LIGHT FIXTURE LED 2X18W SURFACE MOUNTED, NEW",
+   "L04",
+   23
+  ],
+  [
+   "SWITCH SINGLE POLE 10A, WALL MOUNTED, NEW",
+   "L05",
+   6
+  ],
+  [
+   "DISTRIBUTION PANEL BOARD, SURFACE MOUNTED, NEW",
+   "L06",
+   2
+  ]
+ ],
+ "sem_fonte": [],
+ "sem_camada": [],
+ "quadro": [],
+ "cargas": [],
+ "por_cor": [],
+ "nao_e_item": [],
+ "contagens": {
+  "L03": 17,
+  "L04": 23,
+  "L05": 6,
+  "L06": 2
+ },
+ "escala": 50,
+ "comprimentos_pt": {
+  "L01": 3520.0,
+  "L02": 920.0
+ },
+ "comprimentos_m": {
+  "L01": 62.09,
+  "L02": 16.23
+ }
+}
