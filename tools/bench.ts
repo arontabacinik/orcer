@@ -1,7 +1,8 @@
 // OS PORTÕES DO ORCER — o número que diz se ele funciona, medido contra gabarito.
 //
-//   npm run bench                 contagem (peças e metros) + legenda + lista de compra real (se houver as públicas)
+//   npm run bench                 contagem + clique + legenda + lista de compra real (se houver as públicas)
 //   npm run bench -- contagem     só a contagem         env: SET=normal,dificil,lote,sinteticas  PAR=4  V=1
+//   npm run bench -- clique       o que ficou em Revisar: apontar UM exemplar na planta resolve?
 //   npm run bench -- legenda      80 folhas inéditas: a legenda foi lida inteira, com o texto certo?
 //   npm run bench -- lista        21 pranchas públicas reais: nenhum lixo sai como "confirmado"
 //
@@ -10,10 +11,11 @@
 // As folhas de bench/pdf2 são geradas (746 MB): veja bench/README.md.
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
-import { analyzeDocument } from '../src/motor/motor';
+import { analyzeDocument, takeoff } from '../src/motor/motor';
 
 const aqui = fileURLToPath(import.meta.url);
 const RAIZ = path.resolve(path.dirname(aqui), '..');
@@ -21,8 +23,8 @@ const B = path.join(RAIZ, 'bench');
 const require = createRequire(import.meta.url);
 const PAR = Math.max(1, +(process.env.PAR || 4));
 
-// META: o que foi medido na versão final (28/09/2026) e não pode cair
-const META = { pecas: 0.9, altaErrada: 0, legendaPerfeitas: 66, lixoAlta: 0 };
+// META: o que foi medido na versão final (29/09/2026) e não pode cair
+const META = { pecas: 0.94, altaErrada: 0, legendaPerfeitas: 66, lixoAlta: 0, semSaida: 0 };
 
 const norm = (s: string) => (s || '').toUpperCase().normalize('NFD').replace(/[^A-Z0-9]/g, '');
 const iou = (a: number[], b: number[]) => { const x0 = Math.max(a[0], b[0]), y0 = Math.max(a[1], b[1]), x1 = Math.min(a[2], b[2]), y1 = Math.min(a[3], b[3]); const i = Math.max(0, x1 - x0) * Math.max(0, y1 - y0); const u = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - i; return u > 0 ? i / u : 0; };
@@ -36,7 +38,7 @@ async function filho(pdf: string, pag?: string) {
   const out = folhas.map((f) => ({
     pagina: f.pageNum, raster: !!f.raster, prims: f.prims.length,
     itens: f.result!.items.map((it) => ({
-      nome: (it.name || '').replace(/\s+/g, ' ').trim(), bbox: it.bbox, qtd: typeof it.qty === 'number' ? +it.qty.toFixed(2) : null,
+      idx: it.idx, nome: (it.name || '').replace(/\s+/g, ' ').trim(), bbox: it.bbox, qtd: typeof it.qty === 'number' ? +it.qty.toFixed(2) : null,
       unidade: it.unit, conf: it.conf, tipo: it.sw && it.sw.type,
       marcas: (it.marks || []).map((b) => [+((b[0] + b[2]) / 2).toFixed(1), +((b[1] + b[3]) / 2).toFixed(1), +Math.max(b[2] - b[0], b[3] - b[1]).toFixed(1)]),
       camadas: it.foundLayers || (it.sw && it.sw.routeLayers) || [],
@@ -45,9 +47,42 @@ async function filho(pdf: string, pag?: string) {
   process.stdout.write('\n@@ORCER@@' + JSON.stringify(out));
 }
 
-function rodar(args: string[]): Promise<any> {
+// ---------------- filho do CLIQUE: a saída de emergência do produto, medida ----------------
+// A pessoa desenha um retângulo em volta de UM exemplar e o Orcer reconta por aquele desenho. Aqui o
+// retângulo é desenhado por um clicador de mentira: quadrado centrado numa ocorrência do gabarito, do
+// tamanho do ícone. Quando o motor recusa ("cortou", "pegou só um traço", "só achei o que você apontou")
+// ele abre um pouco e tenta de novo — é o que a tela manda a pessoa fazer, e é o que ela faz.
+// O clicador NÃO escolhe pelo resultado: fica com o PRIMEIRO retângulo que o motor aceita sem reclamar.
+async function filhoClique(pdf: string, gtPath: string, pag: string) {
+  const pdfjs = require('pdfjs-dist/legacy/build/pdf.js');
+  const G = JSON.parse(fs.readFileSync(gtPath, 'utf8'));
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(fs.readFileSync(pdf)), verbosity: 0, isEvalSupported: false }).promise;
+  const folhas = await analyzeDocument(pdfjs, doc, undefined, [+pag]);
+  const sheet = folhas[0];
+  const out: any[] = [];
+  for (const g of G) {
+    const it = (sheet.result!.items as any[]).find((i) => i.idx === g.idx);
+    if (!it) continue;
+    let escolhido: any = null;
+    for (const k of [1, 1.3, 1.7, 2.2, 2.8]) {
+      const z = Math.hypot(it.bbox[2] - it.bbox[0], it.bbox[3] - it.bbox[1]) || 12, s = (z * k) / 2;
+      const R2 = takeoff(sheet, { molde: { [it.idx]: [g.onde[0] - s, g.onde[1] - s, g.onde[0] + s, g.onde[1] + s] } } as any);
+      const b: any = (R2.items as any[]).find((i) => i.idx === it.idx);
+      if (!b || !b.molde || !b.moldeProprio) continue;     // "não deu: desenhe de novo, justo em volta de um"
+      if (b.qty === 1 && g.n > 1) continue;                // "só achei o exemplar que você apontou"
+      escolhido = b; break;
+    }
+    out.push({
+      idx: g.idx, qtd: escolhido ? escolhido.qty : null,
+      marcas: escolhido ? (escolhido.marks || []).map((b: number[]) => [+((b[0] + b[2]) / 2).toFixed(1), +((b[1] + b[3]) / 2).toFixed(1), +Math.max(b[2] - b[0], b[3] - b[1]).toFixed(1)]) : [],
+    });
+  }
+  process.stdout.write('\n@@ORCER@@' + JSON.stringify(out));
+}
+
+function rodar(args: string[], modo = '--um'): Promise<any> {
   return new Promise((res) => {
-    const ch = spawn(process.execPath, [...process.execArgv, '--max-old-space-size=3072', aqui, '--um', ...args], { env: { ...process.env, DBGL: '' } });
+    const ch = spawn(process.execPath, [...process.execArgv, '--max-old-space-size=3072', aqui, modo, ...args], { env: { ...process.env, DBGL: '' } });
     let out = '', err = '';
     ch.stdout.on('data', (d) => (out += d)); ch.stderr.on('data', (d) => (err += d));
     ch.on('close', (c) => {
@@ -86,7 +121,7 @@ function alvos(quais: string[]): Alvo[] {
 }
 
 function julgar(S: Alvo, folhas: any[]) {
-  const r = { itens: 0, exatos: 0, alta: 0, altaErrada: 0, metros: 0, metrosExatos: 0, erradas: [] as string[], detalhe: [] as string[] };
+  const r = { itens: 0, exatos: 0, alta: 0, altaErrada: 0, metros: 0, metrosExatos: 0, erradas: [] as string[], detalhe: [] as string[], falhos: [] as any[] };
   const pred = folhas.flatMap((f) => f.itens).filter((it: any) => it.tipo !== 'NOTA');
   if (S.modo === 'camada') {
     const daCamada = (L: string) => pred.filter((i: any) => (i.camadas || []).slice(0, 1).includes(L));
@@ -118,10 +153,23 @@ function julgar(S: Alvo, folhas: any[]) {
       if (d0 <= Math.max(6, 0.75 * m[2]) && dono === g && !pego.has(chave)) pego.add(chave); else fp++;
     }
     const q = it ? it.qtd : null, certo = q === g.n && fp === 0;
+    if (!certo) r.falhos.push({ idx: it ? it.idx : null, texto: g.texto, n: g.n, onde: g.pontos[0], qtd: q });
     if (certo) r.exatos++; else r.detalhe.push(`${S.nome} · ${g.texto.slice(0, 36)} · gabarito ${g.n} · motor ${q == null ? (it ? '—' : 'SUMIU') : q}${fp ? ` · ${fp} marca(s) fora do lugar` : ''}`);
     if (it && it.conf === 'ALTA') { r.alta++; if (!certo) { r.altaErrada++; r.erradas.push(`${S.nome} · ${g.texto.slice(0, 36)} · gabarito ${g.n} · motor ${q}`); } }
   }
   return r;
+}
+
+/** as marcas deste item caem todas sobre ocorrências dele, e nenhuma duas vezes? */
+function marcasOk(S: Alvo, g: any, marcas: number[][]) {
+  const pego = new Set<string>();
+  for (const m of marcas) {
+    let d0 = Infinity, chave = '', dono: any = null;
+    S.itens!.forEach((gg: any, gi: number) => gg.pontos.forEach((p: number[], pi: number) => { const d = Math.hypot(p[0] - m[0], p[1] - m[1]); if (d < d0) { d0 = d; chave = gi + ':' + pi; dono = gg; } }));
+    if (!(d0 <= Math.max(6, 0.75 * m[2]) && dono === g && !pego.has(chave))) return false;
+    pego.add(chave);
+  }
+  return true;
 }
 
 async function contagem(): Promise<boolean> {
@@ -156,6 +204,55 @@ async function contagem(): Promise<boolean> {
   if (cheio && tot.exatos / tot.itens < META.pecas) { ok = false; console.log(`\nFALHOU: ${pct(tot.exatos, tot.itens)} de itens exatos — a meta é ${META.pecas * 100}%`); }
   if (quebradas.length) ok = false;
   return ok;
+}
+
+// ---------------- CLIQUE: a saída de emergência tem saída? ----------------
+// O Orcer nunca chuta: quando o desenho da planta não é o ícone da legenda, o item vai para Revisar e a tela
+// pede "Aponte um na planta". Esse pedido só é honesto se apontar RESOLVER. Aqui todo item que o motor não
+// acertou sozinho recebe um clique de mentira — um retângulo em volta de UMA ocorrência do gabarito — e é
+// julgado pela mesma régua da contagem: quantidade exata E cada marca sobre uma ocorrência real.
+async function clique(): Promise<boolean> {
+  const quais = (process.env.SET || 'normal,dificil,lote').split(',').filter((q) => q !== 'sinteticas');
+  const L = alvos(quais).filter((S) => S.modo !== 'camada'), t0 = Date.now();
+  let naoAcertou = 0, resolvidos = 0, semLinha = 0;
+  const restam: string[] = [], quebradas: string[] = [], faltando: string[] = [];
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'orcer-clique-'));
+  await emParalelo(L, async (S) => {
+    const out = await rodar([S.pdf]);
+    if (out.erro) { quebradas.push(`${S.nome}: ${out.erro}`); return; }
+    const todos = julgar(S, out.folhas).falhos;
+    // item que nem apareceu na lista não tem onde clicar: é falha da LEITURA DA LEGENDA, não do clique
+    for (const f of todos) if (f.idx == null) { semLinha++; faltando.push(`${S.nome} · ${String(f.texto).slice(0, 36)} · gabarito ${f.n} · o item nem saiu na lista`); }
+    const falhos = todos.filter((f: any) => f.idx != null && f.onde);
+    if (!falhos.length) return;
+    naoAcertou += falhos.length;
+    const gt = path.join(tmp, S.nome.replace(/[^\w.-]/g, '_') + '.json');
+    fs.writeFileSync(gt, JSON.stringify(falhos));
+    const r2 = await rodar([S.pdf, gt, String(out.folhas[0].pagina)], '--clique');
+    if (r2.erro) { quebradas.push(`${S.nome} (clique): ${r2.erro}`); return; }
+    for (const f of falhos) {
+      const d = (r2.folhas as any[]).find((x) => x.idx === f.idx);
+      const g = S.itens!.find((x: any) => x.texto === f.texto);
+      if (d && g && d.qtd === f.n && marcasOk(S, g, d.marcas)) resolvidos++;
+      else restam.push(`${S.nome} · ${String(f.texto).slice(0, 36)} · gabarito ${f.n} · sozinho ${f.qtd} · com um clique ${d && d.qtd != null ? d.qtd : '—'}`);
+    }
+  });
+  fs.rmSync(tmp, { recursive: true, force: true });
+  console.log(`\nCLIQUE — ${L.length} folhas: o que o motor deixou em Revisar, um clique resolve?`);
+  console.log(`${naoAcertou} item(ns) o motor não acertou sozinho · ${resolvidos} resolvido(s) apontando UM exemplar` +
+    (naoAcertou ? ` · ${((100 * resolvidos) / naoAcertou).toFixed(0)}%` : '') + `  (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
+  if (semLinha) {
+    console.log(`+ ${semLinha} item(ns) do gabarito que o Orcer não leu na legenda: não têm linha para apontar — é a leitura da legenda, medida em \`npm run bench -- legenda\`.`);
+    if (process.env.V) faltando.sort().forEach((x) => console.log('  ' + x));
+  }
+  if (process.env.V && restam.length) { console.log(`\nnem com o clique (${restam.length}):`); restam.sort().forEach((x) => console.log('  ' + x)); }
+  if (quebradas.length) { console.log('\nquebraram o motor:'); quebradas.forEach((q) => console.log('  ' + q)); }
+  if (naoAcertou - resolvidos > META.semSaida) {
+    console.log(`\nFALHOU: ${naoAcertou - resolvidos} item(ns) que nem apontando na planta se resolvem — o teto é ${META.semSaida}`);
+    if (!process.env.V) restam.sort().forEach((x) => console.log('  ' + x));
+    return false;
+  }
+  return true;
 }
 
 // ---------------- LEGENDA (80 folhas inéditas) ----------------
@@ -218,9 +315,11 @@ async function lista(): Promise<boolean | null> {
 // ---------------- principal ----------------
 async function main() {
   if (process.argv[2] === '--um') return filho(process.argv[3], process.argv[4]);
+  if (process.argv[2] === '--clique') return filhoClique(process.argv[3], process.argv[4], process.argv[5]);
   const qual = process.argv[2] || 'tudo';
   const r: (boolean | null)[] = [];
   if (qual === 'tudo' || qual === 'contagem') r.push(await contagem());
+  if (qual === 'tudo' || qual === 'clique') r.push(await clique());
   if (qual === 'tudo' || qual === 'legenda') r.push(await legenda());
   if (qual === 'tudo' || qual === 'lista') r.push(await lista());
   if (r.some((x) => x === false)) { console.log('\n✗ algum portão falhou'); process.exit(1); }

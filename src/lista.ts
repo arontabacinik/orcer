@@ -66,7 +66,8 @@ export function paraVista(f: Folha): FolhaVista {
     metodo: it.note || '',
     molde: it.molde ? r1(it.molde) : null,
     moldeAutomatico: /mais se parece com ele/.test(it.note || ''),
-    recusaMolde: it.moldePobre ? 'O retângulo pegou só um traço reto — pedaço de parede ou de fio. Envolva o símbolo inteiro.'
+    recusaMolde: it.moldeVazio ? 'O retângulo é menor que o símbolo: nenhum desenho coube inteiro dentro dele. Abra um pouco mais, folgado em volta de UM símbolo.'
+      : it.moldePobre ? 'O retângulo pegou só um traço reto — pedaço de parede ou de fio. Envolva o símbolo inteiro.'
       : it.moldeCortado ? 'O retângulo cortou o desenho. Aproxime a vista e envolva UM símbolo inteiro.'
       : it.molde && !it.moldeProprio ? 'O retângulo não pegou um símbolo inteiro e só ele. Tente de novo, justo em volta de um.' : null,
   }));

@@ -52,6 +52,24 @@ async function main() {
       confirmadoErrado.map((i) => `${i.nome}=${i.qtd}`).join(', '));
   }
 
+
+  console.log('\nlote — quando o desenho da planta não é o ícone da legenda');
+  const lote = path.join(raiz, 'bench/lote');
+  // a RECUSA REPETIDA: o juiz recusa as 27 luminárias pela mesma margem, e a margem constante é a convenção
+  // de desenho da prancha. Sai como Revisar, com o número — nunca como Confirmado.
+  const pc = await ler(path.join(lote, 'parcial-cega-0.pdf'));
+  const lum = pc[0].itens.find((i) => /LIGHT FIXTURE/.test(i.nome));
+  conferir('parcial-cega-0: 27 luminárias pela recusa repetida, em Revisar', lum?.qtd === 27 && lum?.situacao === 'revisar', JSON.stringify([lum?.qtd, lum?.situacao]));
+  conferir('nada confirmado errado nesta folha', pc[0].itens.filter((i) => i.situacao === 'confirmado').length === 0);
+
+  // APONTAR UM NA PLANTA tem de ter saída: o quadro de distribuição não é achado sozinho, e um retângulo
+  // em volta de um exemplar tem de contar os quatro — mesmo com a marcação de parede colada nele.
+  const { lerPdfComMolde } = await import('./molde-teste');
+  const quadro = await lerPdfComMolde(pdfjs, path.join(lote, 'esquematico-cega-0.pdf'), /PANEL/, [431.5, 130.5, 453.1, 152.1]);
+  conferir('esquematico-cega-0: apontando um quadro, conta os 4', quadro.qtd === 4, JSON.stringify(quadro));
+  const pequeno = await lerPdfComMolde(pdfjs, path.join(lote, 'esquematico-cega-0.pdf'), /PANEL/, [440, 139, 444, 143]);
+  conferir('retângulo menor que o símbolo avisa em vez de não fazer nada', /menor que o símbolo/.test(pequeno.recusa || ''), JSON.stringify(pequeno));
+
   console.log(`\n${ok} ok · ${falhas} falha(s)\n`);
   process.exit(falhas ? 1 : 0);
 }

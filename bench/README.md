@@ -1,14 +1,17 @@
 # Bench
 
-`npm run bench` mede três coisas e falha se algum portão ficar vermelho:
+`npm run bench` mede quatro coisas e falha se algum portão ficar vermelho:
 
 | subcomando | o que mede | portão |
 |---|---|---|
-| `contagem` | quantidade exata por item em 102 folhas com gabarito | ≥ 90% exatos · 0 confirmados errados |
+| `contagem` | quantidade exata por item em 102 folhas com gabarito | ≥ 94% exatos · 0 confirmados errados |
+| `clique` | o que ficou em Revisar: apontar UM exemplar resolve? | 0 itens sem saída |
 | `legenda` | itens da legenda em 80 folhas nunca vistas (`legenda/`) | ≥ 66 folhas perfeitas · 0 lixo |
 | `lista` | 144 folhas de pranchas públicas reais | 0 lixo confirmado |
 
 `npm run bench -- contagem` roda só um. Variáveis: `SET=normal,dificil,lote,sinteticas`, `PAR=4` (processos em paralelo), `V=1` (detalhe por item).
+
+O `clique` fecha o contrato do produto. O Orcer nunca chuta: quando o desenho da planta não é o ícone da legenda, o item vai para **Revisar** e a tela pede "Aponte um na planta". Esse pedido só é honesto se apontar resolver — então todo item que o motor não acertou sozinho recebe um retângulo em volta de UMA ocorrência do gabarito e é julgado pela mesma régua da contagem. O clicador não escolhe pelo resultado: fica com o primeiro retângulo que o motor aceita sem reclamar, e quando o motor reclama ("cortou", "pegou só um traço", "só achei o que você apontou") ele abre um pouco e tenta de novo — que é o que a tela manda a pessoa fazer.
 
 ## Os arquivos
 
@@ -30,6 +33,8 @@ cmp /tmp/gt_count.json gt_count.json && cmp /tmp/gt_hard.json gt_hard.json && ec
 ```
 
 As sementes são fixas: as 70 folhas saem sempre iguais e os gabaritos batem byte a byte (conferido com pymupdf 1.28.2).
+
+> **29/09/2026 — correção no gerador.** Na legenda em duas colunas, o bloco declarava a largura pela descrição INTEIRA em vez da linha já quebrada, e a segunda coluna era empurrada para fora da folha: o pymupdf cortava o texto e sobrava a primeira letra de cada linha. O gabarito cobrava 7 itens que não estavam no papel (cnt015, cnt020) e nenhum leitor podia achá-los. Corrigido em `gerar/gen.py` e `gerar/gen2.py`; `gt_count.json` foi regerado e mudou só nas 3 folhas de estilo `columns`, sem mexer em nenhuma contagem (1713 instâncias antes e depois). `gt_hard.json` ficou byte a byte igual.
 
 ## Pranchas públicas
 

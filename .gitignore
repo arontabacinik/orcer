@@ -3,3 +3,4 @@ dist/
 /bench/pdf2
 /plans-externas
 *.log
+__pycache__/

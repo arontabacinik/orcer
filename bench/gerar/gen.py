@@ -64,7 +64,12 @@ def legend_block(S, x, y, items, style, header, sections):
         S.text(x,cy+th*1.4,header,th*1.4,"LEGENDA" if S.o["legend_layer"] else "E-TEXTO"); cy+=th*2.6
     colgap = th*2
     icon_w = u*2.8
-    width_text = th*0.55*max(len(d) for d,_,_ in items)
+    # a LARGURA DO BLOCO é a da linha mais comprida DEPOIS de quebrar. Medindo pela descrição inteira, o
+    # bloco se declarava muito mais largo do que desenhava: na legenda em duas colunas a segunda era
+    # empurrada para fora da folha e o pymupdf cortava o texto, deixando só a primeira letra de cada linha
+    # (cnt015 e cnt020: 7 itens de gabarito que não estavam no papel — nenhum leitor podia achá-los).
+    _linhas = [l for d,_,_ in items for l in (wrap(d, S.o["wrap"]) if S.o["wrap"] else [d])]
+    width_text = th*0.55*max(len(l) for l in _linhas)
     rows=[]
     if style=="table":
         # header row

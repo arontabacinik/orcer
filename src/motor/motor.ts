@@ -1145,15 +1145,35 @@ import * as IDENTIDADE from "./identidade";
     // A legenda continua sendo de onde o item veio; só o desenho que se procura muda.
     for (const it of items) {
       const r = opts.molde && opts.molde[it.idx]; if (!r) continue;
-      const ps = sheet.prims.filter(p => inRect(p.bbox, r) && !isTextPrim(p) && p.segs && p.segs.length);
-      if (!ps.length) continue;
+      let ps = sheet.prims.filter(p => inRect(p.bbox, r) && !isTextPrim(p) && p.segs && p.segs.length);
+      // nenhum desenho INTEIRO dentro: o retângulo é menor que o símbolo. Sair calado deixava a pessoa
+      // clicando de novo sem saber o que houve — o retângulo pequeno demais tem de dizer o que fazer.
+      if (!ps.length) { it.moldeVazio = true; continue; }
+      // A CAMADA DIZ O QUE É O SÍMBOLO; o retângulo diz só ONDE. O CAD já separa o símbolo do mobiliário,
+      // da cota e da marcação de parede: quando quase toda a tinta de dentro está numa camada e sobra um
+      // resto pequeno de outra, o resto é vizinhança que entrou junto, não parte do desenho. Só até 1/4 da
+      // tinta — símbolo desenhado de verdade em duas camadas tem peso nas duas, e aí fica tudo.
+      const camadaDe = new Map<string, number>();
+      for (const p of ps) if (p.layer) camadaDe.set(p.layer, (camadaDe.get(p.layer) || 0) + (p.len || 0));
+      const tinta = ps.reduce((a, p) => a + (p.len || 0), 0);
+      const dom = [...camadaDe.entries()].sort((a, b) => b[1] - a[1])[0];
+      if (dom && tinta > 0 && dom[1] >= tinta * 0.75) {
+        const so = ps.filter(p => p.layer === dom[0]);
+        if (so.length) ps = so;
+      }
       // o retângulo CORTOU um desenho? traço do tamanho de símbolo que atravessa a borda é o resto dele
       // (fio e parede atravessam também, mas são longos). Meio símbolo casaria com tudo que tem aquela metade.
       let b = null; for (const p of ps) b = b ? union(b, p.bbox) : p.bbox.slice();
       const z = Math.hypot(b[2] - b[0], b[3] - b[1]);
       // só é "o resto dele" se ENCOSTA no que ficou dentro — um móvel ou texto vizinho na borda não é corte
       const encosta = p => ps.some(q => Math.max(p.bbox[0] - q.bbox[2], q.bbox[0] - p.bbox[2], p.bbox[1] - q.bbox[3], q.bbox[1] - p.bbox[3]) <= 0.25);
-      const cortou = sheet.prims.some(p => !isTextPrim(p) && p.segs && p.segs.length && !inRect(p.bbox, r) && p.bbox[0] < r[2] && p.bbox[2] > r[0] && p.bbox[1] < r[3] && p.bbox[3] > r[1] && pdiag(p) <= z * 1.5 && encosta(p));
+      // ... e da MESMA CAMADA que o símbolo. Encostar não é ser: a cinta de parede desenhada colada no
+      // quadro de distribuição fazia o retângulo CERTO ser recusado como "cortou o desenho", e nenhum
+      // retângulo salvava — a saída de emergência do produto não tinha saída. Medido no lote: o quadro era
+      // o único item que um clique não resolvia, em 5 folhas. Sem camada declarada, vale a regra antiga.
+      const camadas = new Set(ps.map(p => p.layer).filter(Boolean));
+      const mesmaCamada = p => !camadas.size || !p.layer || camadas.has(p.layer);
+      const cortou = sheet.prims.some(p => !isTextPrim(p) && p.segs && p.segs.length && !inRect(p.bbox, r) && p.bbox[0] < r[2] && p.bbox[2] > r[0] && p.bbox[1] < r[3] && p.bbox[3] > r[1] && pdiag(p) <= z * 1.5 && mesmaCamada(p) && encosta(p));
       if (cortou) { it.moldeCortado = true; continue; }
       // um traço reto sozinho não é símbolo: é pedaço de parede ou de fio, e casa com a planta inteira
       // (bench/clique.js: um retângulo pequeno demais em volta do quadro pegou 6 pt de parede e contou 298)
@@ -1533,19 +1553,33 @@ import * as IDENTIDADE from "./identidade";
         // parecido com "todo traço dele e mais alguma coisa" é outro símbolo que o contém (bench/clique.js: o
         // interruptor apontado somava 4 desenhos de uma fileira de outro material).
         if (it.molde) continue;
-        if (!it.duvidas.every(d => (d.fw || 0) >= 0.95)) continue;
+        const fws = it.duvidas.map(d => d.fw || 0), rvs = it.duvidas.map(d => d.rv || 0);
+        const espalha = (a: number[]) => Math.max.apply(null, a) - Math.min.apply(null, a);
+        // (a1) TODO traço do ícone está ali: o desenho da planta é o do ícone com preenchimento ou detalhe a mais.
+        const maisAlgo = fws.every(v => v >= 0.95);
+        // (a2) a RECUSA REPETIDA: o juiz recusou N lugares pela MESMA margem, até a segunda casa — mesma ida,
+        // mesma volta, mesmo tamanho. Um traço de parede ou um pedaço de móvel não reproduz a mesma fração de
+        // contenção em 27 lugares; um BLOCO inserido 27 vezes reproduz. A margem constante não é ruído: é a
+        // diferença fixa entre como a legenda desenha o símbolo e como a planta o desenha — uma convenção.
+        // Aqui o número inteiro vem da repetição, então só vale para quem saiu ZERO: onde já há ocorrência
+        // provada, somar um monte de "quase" mistura duas provas de força muito diferente. (a1) continua
+        // valendo para quem já tem quantidade. Medido no lote: +6 itens exatos em 120, 0 piora em 536.
+        const mesmaRecusa = !it.qty && it.duvidas.length >= 3 && espalha(fws) <= 0.02 && espalha(rvs) <= 0.02
+          && Math.max.apply(null, fws) >= 0.85 && Math.max.apply(null, rvs) >= 0.6;
+        if (!maisAlgo && !mesmaRecusa) continue;
         // e o lugar tem o TAMANHO do ícone, num tamanho só: na hard011 as 24 recusadas eram fragmentos de
         // 0,2 pt de um ícone de 8 pt — dois por luminária, e o item saía com o dobro da quantidade
         const zi = it.bbox ? Math.hypot(it.bbox[2] - it.bbox[0], it.bbox[3] - it.bbox[1]) : 0;
         if (!zi) continue;
         const dz = it.duvidas.map(d => Math.hypot(d.bbox[2] - d.bbox[0], d.bbox[3] - d.bbox[1]));
         if (Math.min.apply(null, dz) < zi * 0.5 || Math.max.apply(null, dz) > zi * 2) continue;
-        if (Math.max.apply(null, dz) > Math.min.apply(null, dz) * 1.1) continue;
+        // a recusa repetida é uma afirmação sobre repetição: o tamanho tem de ser o MESMO, não só parecido
+        if (Math.max.apply(null, dz) > Math.min.apply(null, dz) * (maisAlgo ? 1.1 : 1.02)) continue;
         const sigs = it.duvidas.map(d => assinaDe(d.bbox, true));
         if (sigs.some(g => !g) || new Set(sigs).size !== 1) continue;
         const dono = contadas.get(sigs[0]);
         if (dono && dono !== it) continue;                       // este desenho já é de outro item
-        it.convencao = { n: it.duvidas.length, sig: sigs[0], why: it.duvidas[0].why };
+        it.convencao = { n: it.duvidas.length, sig: sigs[0], why: it.duvidas[0].why, modo: maisAlgo ? "mais" : "igual" };
       }
       for (const a of pointItems) if (a.convencao) for (const b of pointItems) if (b !== a && b.convencao && b.convencao.sig === a.convencao.sig) a.convencao = null;
 
@@ -1634,7 +1668,9 @@ import * as IDENTIDADE from "./identidade";
           if (!novas.length) { conf = "MEDIA"; notes.push("As " + it.duvidas.length + " ocorrência(s) recusadas são as mesmas já contadas."); }
           else {
             it.marks = antes.concat(novas); it.qty = it.marks.length; conf = "MEDIA";
-            notes.push((antes.length ? antes.length + " ocorrência(s) conferida(s) e mais " : "") + novas.length + " ocorrência(s) do MESMO desenho, que tem todo traço do ícone e mais alguma coisa (" + it.convencao.why + ") — é a convenção de legenda, em que o símbolo aparece em contorno na legenda e preenchido na planta. Confira antes de comprar: isto não é medida.");
+            notes.push(it.convencao.modo === "igual"
+              ? novas.length + " ocorrência(s) do MESMO desenho, recusadas todas pela MESMA margem (" + it.convencao.why + "): o ícone da legenda não é o desenho da planta, mas a diferença é sempre a mesma — é a convenção de desenho desta prancha. Número contado pela repetição, não provado pelo símbolo. Confira antes de comprar."
+              : (antes.length ? antes.length + " ocorrência(s) conferida(s) e mais " : "") + novas.length + " ocorrência(s) do MESMO desenho, que tem todo traço do ícone e mais alguma coisa (" + it.convencao.why + ") — é a convenção de legenda, em que o símbolo aparece em contorno na legenda e preenchido na planta. Confira antes de comprar: isto não é medida.");
           }
         }
         else if (it.qty === 0 && it.porCor) {

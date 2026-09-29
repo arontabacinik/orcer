@@ -11,7 +11,7 @@ Realistic hardships, all with ground truth:
 """
 import pymupdf as fitz, random, math, json, sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from gen import Sheet, legend_block, notes, loadtable, titleblock, COLORS, DESCS, LONGDESCS, HEADERS, SECTIONS
+from gen import Sheet, legend_block, notes, loadtable, titleblock, wrap, COLORS, DESCS, LONGDESCS, HEADERS, SECTIONS
 
 # só descrições de ITEM DE PONTO: as de rota (eletroduto, eletrocalha, cabo) viram metros, não unidades
 LINEAR = ("ELETROCALHA", "ELETRODUTO", "PERFILADO", "LEITO", "CABO", "CABLE TRAY", "CANALETA")
@@ -138,6 +138,12 @@ def make(seed, out):
         sec = {0: SECTIONS[0], len(items) // 2: SECTIONS[rnd.randint(1, 4)]}
     if style == "columns" and len(items) >= 4:
         h = len(items) // 2
+        # as DUAS colunas têm de caber na folha. Sem isto a segunda saía pela borda direita e o pymupdf
+        # cortava o texto: o gabarito cobrava item que não estava no papel (cnt015, cnt020).
+        def larg(its):
+            linhas = [l for d, _, _ in its for l in (wrap(d, opts["wrap"]) if opts["wrap"] else [d])]
+            return S._legu * 2.8 + th * 2 + th * 0.55 * max(len(l) for l in linhas) + th * 1.2
+        lx = min(lx, max(th * 6, W - th * 3 - larg(items[:h]) - th * 3 - larg(items[h:])))
         b1 = legend_block(S, lx, ly, items[:h], "list", header, None)
         legend_block(S, b1[2] + th * 3, ly + (th * 2.6 if header else 0), items[h:], "list", None, None)
     else:
