@@ -73,6 +73,10 @@ bench/        gabaritos e geradores (veja bench/README.md)
 - Quando o símbolo da planta é muito diferente do ícone da legenda, o item cai em **Revisar** com contagem zero e o aviso "sobraram N desenhos repetidos sem dono". Um clique em *Apontar um na planta* resolve: nas 28 vezes em que isso aconteceu no benchmark, resolveu as 28.
 - Rota (eletroduto, eletrocalha) numa prancha **monocromática** cujo traço da legenda está na camada da própria legenda: nem a cor nem a camada ligam a legenda ao desenho, e o Orcer entrega 0 m. São 4 das 44 medições de metro do benchmark.
 
+## O ensaio
+
+[**O Orcer e a recusa repetida**](ENSAIO.md) — como o motor chegou a 508/536, por que os 28 que sobram se resolvem com um clique, e o que foi preciso descobrir sobre o próprio benchmark para saber que os números estavam certos.
+
 ## Privacidade
 
 Plantas de cliente são intocáveis: nunca entram neste repositório, nos testes nem no bench. Os testes usam só folhas geradas (`bench/gerar`), o exemplo em `public/exemplos` e pranchas públicas de editais (`plans-externas.zip`, fora do repositório).

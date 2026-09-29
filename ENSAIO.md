@@ -1,0 +1,127 @@
+# O Orcer e a recusa repetida
+
+*29 de setembro de 2026 · sobre a versão 1.1*
+
+O Orcer lê a legenda de um projeto elétrico em PDF, conta cada símbolo na planta e entrega a lista de materiais. Nesta versão ele acerta a quantidade exata de 508 dos 536 itens do benchmark (94,8%) sem ajuda nenhuma, e **zero** dos 536 saiu confirmado e errado. Os 28 que sobraram se resolvem todos apontando um exemplar na planta — não é uma promessa, é um portão do benchmark que roda a cada medição. Este ensaio é sobre a ideia que fechou a maior parte da distância, e sobre o que foi preciso descobrir para saber que ela estava certa.
+
+## O contrato
+
+Num orçamento de obra, um número errado não é um erro de software: é material comprado a mais que fica no canteiro, ou material a menos que para a equipe na sexta-feira. Quem faz o levantamento à mão sabe exatamente onde está inseguro. Um programa que devolve uma planilha limpa apaga essa informação — e apagar a dúvida é pior do que não contar.
+
+Daí o único contrato do Orcer: **"Confirmado" quer dizer "pode comprar"**. Uma linha só sai confirmada quando cada ocorrência contada foi provada como sendo o símbolo da legenda. Quando a prova não fecha, a linha sai como **Revisar**, com o número que o motor conseguiu, o motivo por escrito e cada ocorrência marcada no desenho.
+
+O contrato é fácil de enunciar e caro de manter, porque ele proíbe exatamente o atalho que todo sistema de contagem quer tomar: na dúvida, chutar o mais provável. O benchmark cobra isso com um teto que não é uma meta, é zero — nenhuma quantidade confirmada pode estar errada. Em 536 itens, nenhuma está.
+
+O que esse contrato *permite*, e é onde mora o trabalho difícil, é entregar um número sem prova, desde que ele venha rotulado como tal. Revisar com 27 unidades e o método escrito é útil. Revisar com zero é quase inútil. A diferença entre as duas coisas é o assunto deste ensaio.
+
+## O juiz, e por que a volta importa
+
+O Orcer não classifica imagens. Ele lê os traços que o CAD gravou no PDF e pergunta, lugar por lugar: **este pedaço da planta é o ícone da legenda?** A pergunta é respondida por semelhança pura — girar, espelhar, mudar de escala, nunca esticar nem entortar — e tem de dar certo nos dois sentidos:
+
+- **ida**: todo traço do ícone cai sobre tinta da planta ali;
+- **volta**: toda a tinta dali cai sobre traço do ícone.
+
+A volta parece redundante e não é. Sem ela, o hexágono da legenda "é" o círculo com uma letra dentro, porque o círculo cobre o hexágono inteiro. Sem ela, o círculo vazio "é" o círculo preenchido. Esticar também parece inofensivo e não é: um quadrado com uma diagonal, esticado, vira qualquer célula de qualquer tabela da prancha.
+
+O juiz devolve dois números — quanto da ida fechou (`fw`) e quanto da volta fechou (`rv`) — e só aprova com 95% dos dois lados. É um juiz severo, e a severidade é o que sustenta o contrato: os 370 itens que saem confirmados saem confirmados porque passaram por ele.
+
+Mas um juiz severo produz muita recusa. E foi olhando para as recusas, e não para as aprovações, que apareceu a ideia que faltava.
+
+## A recusa repetida
+
+O conjunto mais duro do benchmark chama-se *lote*: 30 folhas em que o desenho da planta **de propósito não é** o ícone da legenda. A legenda mostra o símbolo simplificado e a planta o desenha detalhado; ou o contrário; ou a planta usa um esquemático que só lembra o ícone. É o que pranchas reais fazem o tempo todo, e era onde o Orcer parava: 86 de 120.
+
+Numa dessas folhas, o item "LIGHT FIXTURE LED 2X18W" saiu com **zero**. O gabarito diz 27. Olhando o que o juiz tinha recusado ali, apareceu isto:
+
+| recusas | ida (`fw`) | volta (`rv`) | tamanho | tamanho / ícone |
+| --- | ---: | ---: | ---: | ---: |
+| 27 | 0,87 | 0,68 | 13,4 pt | 1,00 |
+
+Vinte e sete recusas. Todas com a **mesma** ida, até a segunda casa. Todas com a **mesma** volta. Todas do mesmo desenho, todas do mesmo tamanho, e esse tamanho igual ao do ícone.
+
+O limiar existente exigia ida ≥ 0,95 para tratar a diferença como convenção de desenho, e 0,87 ficava de fora — com razão, porque 0,87 sozinho não quer dizer nada. Mas 0,87 **vinte e sete vezes seguidas, idêntico**, quer dizer muito. Um pedaço de parede não reproduz a mesma fração de contenção em 27 lugares. Um canto de móvel não reproduz. Um bloco de CAD inserido 27 vezes reproduz, e só ele.
+
+A margem constante não é ruído. É a diferença fixa entre como a legenda desenha aquele símbolo e como a planta o desenha — quer dizer, a convenção de desenho daquela prancha. O juiz não errou ao recusar: aquilo de fato não é o ícone. O que ele não sabia é que **errar sempre igual é uma informação**.
+
+A regra que saiu disso é curta e cheia de cercas:
+
+- só para item que saiu **zero** — onde já há ocorrência provada, somar um monte de "quase" mistura duas provas de força muito diferente;
+- **três ou mais** recusas — duas podem ser coincidência;
+- ida e volta com dispersão ≤ 0,02 entre todas — é a uniformidade que argumenta, não o valor;
+- o mesmo desenho (mesma assinatura de operações) e o mesmo tamanho a 2%;
+- nenhum outro item da legenda reivindicando aquele desenho;
+- e sai **sempre como Revisar**, com o método escrito na linha.
+
+Seis itens a mais exatos no lote. Nenhuma piora nos outros 416. E nada disso pode virar "Confirmado", porque nada disso é identidade — é repetição, que é outra coisa e está escrita como outra coisa.
+
+## A saída de emergência precisava ter saída
+
+A regra nova resolveu seis itens. Sobraram 28, e a resposta do Orcer para eles é sempre a mesma: a linha vai para Revisar com o aviso *"sobraram N desenhos repetidos sem dono, do tamanho dele. Aponte um na planta se for este material — isto não é zero."* A pessoa desenha um retângulo em volta de um exemplar e o Orcer reconta aquele item por aquele desenho.
+
+Esse pedido é a saída de emergência do produto inteiro. E ninguém nunca tinha medido se ela abre.
+
+Então medi. Todo item que o motor não acerta sozinho recebe um retângulo em volta de uma ocorrência do gabarito, e o resultado é julgado pela mesma régua da contagem: quantidade exata **e** cada marca sobre uma ocorrência real. O clicador de mentira não escolhe pelo resultado — fica com o primeiro retângulo que o motor aceita sem reclamar, e quando o motor reclama, abre um pouco e tenta de novo, que é o que a tela manda a pessoa fazer.
+
+Na primeira rodada: **23 de 28**. Os cinco que faltavam eram todos o mesmo item — o quadro de distribuição — e a causa era boa de achar e constrangedora de encontrar.
+
+O motor tem uma proteção contra retângulo mal desenhado: se um traço do tamanho de símbolo atravessa a borda encostando no que ficou dentro, o retângulo **cortou** o desenho, e meio símbolo casaria com qualquer coisa que tenha aquela metade. Sensata. Mas nessas folhas havia uma marcação de parede desenhada colada no quadro. Encostava. Tinha o tamanho certo. E fazia o retângulo **correto** ser recusado — todos eles, de qualquer tamanho. A saída de emergência estava trancada por dentro.
+
+A correção é uma frase: **a camada diz o que é o símbolo; o retângulo diz só onde ele está.** O CAD já separa o símbolo do mobiliário, da cota e da marcação de parede. Quando quase toda a tinta de dentro do retângulo está numa camada e sobra um resto pequeno de outra, o resto é vizinhança que entrou junto, não parte do desenho — e um traço de outra camada que encosta na borda não é "o resto dele". Encostar não é ser.
+
+Apareceu junto um segundo defeito, menor e mais feio: retângulo **menor** que o símbolo não fazia nada. Nenhuma contagem, nenhum aviso, nenhum motivo. A pessoa clicava de novo sem saber o que tinha acontecido. Agora ele diz o que fazer.
+
+Com as duas correções: **28 de 28**. E isso virou um portão permanente do benchmark, `npm run bench -- clique`, que falha se algum dia um item ficar sem saída.
+
+## O gabarito cobrava o que não estava no papel
+
+O portão do clique tem uma cláusula que parecia burocrática: item que o motor nem colocou na lista não tem onde clicar, então conta à parte. Sete itens caíram nessa cláusula, todos em duas folhas.
+
+Fui ver por quê. As duas folhas têm a legenda em duas colunas, e o motor lia a primeira e perdia a segunda inteira. Parecia um defeito claro do leitor de legenda — até eu abrir o PDF e procurar o texto que faltava. Estava lá, assim:
+
+```
+'Q'  [46.2, -1.1, 52.1, 2.2]
+'L'  [52.0, -0.2, 57.9, 2.2]
+'P'  [66.6, -0.7, 72.5, 2.2]
+```
+
+Uma letra por linha. "Q" de "QUADRO DE DISTRIBUIÇÃO DE", "L" de "LUZ - NOVO", "P" de "PONTO DE DADOS/VOZ RJ45 CAT6". O gerador do benchmark desenhava a segunda coluna da legenda para fora da borda direita da folha, e a biblioteca que escreve o PDF cortava o texto no limite do papel. Sobrava a primeira letra de cada linha.
+
+**O gabarito cobrava sete itens que não estavam no papel.** Nenhum leitor poderia achá-los — nem o Orcer, nem uma pessoa, nem nada. O motor estava certo e a régua estava errada, e a régua errada estava na página inicial do projeto como um número a menos, havia meses.
+
+A causa era de uma linha: ao calcular a própria largura, o bloco da legenda media pela descrição **inteira** em vez da linha já quebrada. Declarava-se muito mais largo do que desenhava, e empurrava a coluna seguinte para fora.
+
+Corrigido o gerador, as folhas foram regeradas com as mesmas sementes. O gabarito mudou só nas três folhas de legenda em duas colunas; nenhuma contagem se mexeu (1.713 instâncias antes e depois) e o gabarito do conjunto *difícil* saiu byte a byte igual. O conjunto *normal* passou de 196/203 para **203/203**.
+
+Nenhuma linha do motor mudou para isso acontecer. É o tipo de ganho de que se desconfia com razão — por isso o registro do que mudou está no [`bench/README.md`](bench/README.md), com a causa, o diff e o que continuou idêntico. Um benchmark também é código, e ninguém tinha medido o medidor.
+
+## O que ficou de fora
+
+Onde o benchmark parou:
+
+| conjunto | itens | quantidade exata | confirmados errados |
+| --- | ---: | ---: | ---: |
+| normal | 203 | 203 · 100% | 0 |
+| difícil (girado, escaneado, texto em curva) | 125 | 125 · 100% | 0 |
+| lote (o desenho da planta NÃO é o ícone) | 120 | 92 · 76,7% | 0 |
+| sintéticas (gabarito por camada) | 88 | 88 · 100% | 0 |
+| **total** | **536** | **508 · 94,8%** | **0** |
+
+Os 28 do lote se resolvem todos com um clique. Duas coisas não se resolvem, e vale dizer por que não foram forçadas.
+
+**Os 28 poderiam virar zero automaticamente?** Provavelmente não sem mentir. Nessas folhas, o melhor candidato para os itens que sobram pontua ida 0,66 e volta 0,60 — as formas são genuinamente diferentes. Baixar o limiar automático até pegar esses casos deixa entrar qualquer coisa. Uma versão anterior já tinha medido a alternativa óbvia (atribuir cada desenho órfão ao item cuja forma mais se parece) e registrado o resultado no código: acertava 6 de 18, ou seja, inventaria número em dois terços dos casos. A opção honesta é pedir o clique — e garantir que o clique funcione, que é o que foi feito.
+
+**Quatro medições de metro, de 44, saem 0 m.** São duas folhas em que a planta é inteiramente preta e o traço da rota, na legenda, está desenhado na camada *da própria legenda*. Nem a cor nem a camada ligam a legenda ao desenho. Dá para inferir por eliminação — sobraram duas camadas com linha comprida, há dois itens de rota na legenda —, e eu não fiz: é exatamente o tipo de salto que o resto do motor recusa, e eu não tinha aqui o conjunto de pranchas públicas reais para medir quanto lixo isso traria junto. Mudar a doutrina do zero sem poder medir o custo seria trocar um limite conhecido por um risco desconhecido. Ficou anotado nos limites do README.
+
+Uma ressalva sobre o próprio número: o portão das pranchas públicas reais (144 folhas, "nenhum texto de lixo confirmado como material") não pôde rodar nesta sessão, porque esse conjunto não está no repositório. O argumento de que ele continua verde é estrutural, não empírico: as duas alavancas novas só produzem **Revisar**, e o que aquele portão mede é lixo saindo como **Confirmado**. É um argumento bom, mas é um argumento — e a diferença entre um argumento e uma medida é o assunto do projeto inteiro.
+
+## O que "pronto" quer dizer aqui
+
+Três das quatro coisas feitas nesta versão não foram melhorias no reconhecimento. Uma foi aprender a ler as recusas do próprio motor. Outra foi destravar uma saída que estava trancada por dentro. A terceira foi descobrir que a régua cobrava o que não existia. Nenhuma delas é "o algoritmo ficou mais esperto".
+
+Acho que esse é o formato normal de terminar um programa desses, e não a exceção. Um sistema que se recusa a chutar acumula, em vez de erros, **recusas** — e as recusas são dados. O padrão nelas foi o que fechou seis casos. O aviso que o produto dá quando desiste é uma promessa feita ao usuário, e ninguém tinha verificado se ela se cumpre; verificar virou um portão que roda para sempre. E medir o medidor devolveu sete itens que o motor sempre soube ler.
+
+O número final não é 94,8%. É este:
+
+> **508 de 536 sozinho. 536 de 536 com um clique no que ele mesmo marcou como Revisar. Nenhum dos 536 confirmado e errado.**
+
+A segunda frase só vale porque a terceira é verdadeira. Se "Confirmado" fosse um palpite bem-educado, saber que o clique resolve o resto não serviria de nada — a pessoa não teria como saber onde clicar. O que torna o Orcer utilizável não é a fração que ele acerta: é ele saber, e dizer, de qual fração se trata.
