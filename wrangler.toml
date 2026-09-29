@@ -1,0 +1,5 @@
+# Cloudflare Pages — o Orcer é um site estático: `npm run build` gera dist/ e é isso que sobe.
+# Nenhum dado sai do navegador de quem usa; o Pages só serve os arquivos.
+name = "orcer"
+compatibility_date = "2026-09-29"
+pages_build_output_dir = "dist"

@@ -1,0 +1,51 @@
+# Publica o Orcer no Cloudflare Pages a cada push no main.
+#
+# Precisa de dois segredos no repositório (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   token com a permissão "Cloudflare Pages: Edit"
+#   CLOUDFLARE_ACCOUNT_ID  o Account ID da conta Cloudflare
+# Sem eles o job falha no passo do deploy e nada é publicado.
+#
+# O Orcer é estático: sobe o dist/ e pronto. Nenhum PDF passa por servidor nenhum —
+# o motor roda no navegador de quem usa, aqui e em qualquer hospedagem.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-pages
+  cancel-in-progress: true
+
+jobs:
+  pages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # o build já roda `tsc --noEmit` antes do vite: não publica o que não compila
+      - run: npm run build
+
+      # a conferência rápida (exemplo + sintéticas + lote) — segundos, e segura
+      # um deploy que quebrou a contagem
+      - run: npm test
+
+      - name: Publicar no Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          # cria o projeto na primeira vez; depois disso o comando falha por já existir
+          npx --yes wrangler@4.143.0 pages project create orcer \
+            --production-branch=main || true
+          npx --yes wrangler@4.143.0 pages deploy --branch=main

@@ -4,3 +4,4 @@ dist/
 /plans-externas
 *.log
 __pycache__/
+.wrangler/

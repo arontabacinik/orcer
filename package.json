@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "deploy": "npm run build && npx --yes wrangler@4.143.0 pages deploy --branch=main",
     "typecheck": "tsc --noEmit",
     "contar": "tsx tools/contar.ts",
     "bench": "tsx tools/bench.ts",

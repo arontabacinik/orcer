@@ -73,6 +73,25 @@ bench/        gabaritos e geradores (veja bench/README.md)
 - Quando o símbolo da planta é muito diferente do ícone da legenda, o item cai em **Revisar** com contagem zero e o aviso "sobraram N desenhos repetidos sem dono". Um clique em *Apontar um na planta* resolve: nas 28 vezes em que isso aconteceu no benchmark, resolveu as 28.
 - Rota (eletroduto, eletrocalha) numa prancha **monocromática** cujo traço da legenda está na camada da própria legenda: nem a cor nem a camada ligam a legenda ao desenho, e o Orcer entrega 0 m. São 4 das 44 medições de metro do benchmark.
 
+## Publicar
+
+O Orcer é estático: `npm run build` gera `dist/` e qualquer hospedagem serve. Nenhum PDF passa por servidor nenhum — o motor roda no navegador de quem usa.
+
+**Cloudflare Pages**, já configurado (`wrangler.toml`, projeto `orcer`):
+
+```bash
+npm run deploy       # build + wrangler pages deploy (precisa estar autenticado)
+```
+
+Ou automático, a cada push no `main`, por `.github/workflows/deploy.yml` — que roda `npm run build` e `npm test` antes de publicar. Para ligar, dois segredos em *Settings → Secrets and variables → Actions*:
+
+| segredo | o que é |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | token com a permissão **Cloudflare Pages: Edit** |
+| `CLOUDFLARE_ACCOUNT_ID` | o Account ID da conta Cloudflare |
+
+O primeiro deploy cria o projeto Pages sozinho. O endereço sai como `orcer.pages.dev`.
+
 ## O ensaio
 
 [**O Orcer e a recusa repetida**](ENSAIO.md) — como o motor chegou a 508/536, por que os 28 que sobram se resolvem com um clique, e o que foi preciso descobrir sobre o próprio benchmark para saber que os números estavam certos.
