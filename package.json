@@ -11,6 +11,7 @@
     "deploy": "npm run build && npm test && npx --yes wrangler@4.143.0 deploy",
     "typecheck": "tsc --noEmit",
     "contar": "tsx tools/contar.ts",
+    "aferir": "tsx tools/aferir.ts",
     "bench": "tsx tools/bench.ts",
     "test": "tsx tools/testes.ts",
     "tela": "tsx tools/tela.ts"

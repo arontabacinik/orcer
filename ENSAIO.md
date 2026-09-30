@@ -2,7 +2,7 @@
 
 *30 de setembro de 2026 · sobre a versão 1.1*
 
-O Orcer lê a legenda de um projeto elétrico em PDF, conta cada símbolo na planta e entrega a lista de materiais. Nesta versão ele acerta a quantidade exata de 508 dos 536 itens do benchmark (94,8%) sem ajuda nenhuma, e **zero** dos 536 saiu confirmado e errado. Os 28 que sobraram se resolvem todos apontando um exemplar na planta — não é uma promessa, é um portão do benchmark que roda a cada medição. E numa prancha que ele nunca viu, 94,5% das linhas saem sem pedir revisão. Este ensaio é sobre as ideias que fecharam essa distância, e sobre o que foi preciso descobrir — e recusar — para saber que estavam certas.
+O Orcer lê a legenda de um projeto elétrico em PDF, conta cada símbolo na planta e entrega a lista de materiais. Nesta versão ele acerta a quantidade exata de 508 dos 536 itens do benchmark (94,8%) e **zero** dos 536 sai confirmado e errado. Guarde uma ressalva desde já, porque ela volta perto do fim e muda o peso de tudo: **todas essas 536 folhas foram geradas pelo próprio projeto**, e nenhum desses números foi medido numa prancha real. Este ensaio é sobre as ideias que fecharam a distância medida, sobre o que foi preciso recusar pelo caminho, e sobre a medida que faltava.
 
 ## O contrato
 
@@ -158,6 +158,22 @@ Num corte em 0,70 — o número que a intuição escolhe — eu confirmaria 6 it
 O resultado, em 50 folhas que o motor não usou para se ajustar: **310 de 328 itens com resposta firme, 94,5%**. Trinta e quatro das 50 folhas não deixam nada para conferir; a pior deixa dois itens. Nenhuma quantidade confirmada errada, nenhum zero sobre item que existe.
 
 E uma coisa que a medição desmontou: os 90% **por folha** não são uma meta que se possa cobrar. As folhas têm de 3 a 10 itens, então um único "Revisar" leva a folha de 100% direto para 75% ou 88% — não existe 90% nessa escala. O que dá para cobrar, e o que o portão `firmeza` cobra, é o trabalho que sobra: quantos itens a folha deixa para a pessoa conferir. Esse número não depende do tamanho da folha, e hoje ele é **dois, no pior caso**.
+
+## O número que eu não tinha medido
+
+Preciso corrigir este ensaio no meio dele, porque ele passou seis seções dizendo um número com mais confiança do que o número merecia.
+
+Todas as 536 folhas do benchmark — as 203 do conjunto *normal*, as 125 do *difícil*, as 120 do *lote*, as 88 *sintéticas* — foram **geradas por `bench/gerar`**. Os gabaritos são exatos porque o mesmo script que desenhou a folha escreveu o gabarito. Até as "80 folhas que o motor nunca viu", que eu citei como prova de generalização, saem do mesmo gerador com outra semente: são um conjunto de validação, não pranchas do mundo.
+
+O único material real do projeto são 144 páginas de pranchas de editais públicos, e o que existe sobre elas é uma lista de 206 julgamentos do tipo `{arquivo, página, texto, é material: sim/não}`. **Sem uma única quantidade de gabarito.** Esse conjunto pode dizer se o Orcer chamou de material um texto que não é; não pode dizer se ele contou certo. Nunca pôde.
+
+Então: **"94,8% dos itens com a quantidade exata" nunca foi medido numa prancha real.** Nem uma vez. E eu ajustei limiares contra essas mesmas folhas nesta versão — o corte de 0,50 das recusas, a exaustão, a camada como testemunha. Um número ajustado no conjunto em que é medido não é uma medida, é um eco.
+
+Dá para calibrar o quanto isso importa olhando para fora. O trabalho publicado em 2026 sobre detecção de símbolo em diagramas de construção reais fica em torno de **79% de mAP** com YOLO. Um motor que marca 94,8% num conjunto próprio não está 16 pontos à frente do estado da arte: está medindo outra coisa. A diferença entre os dois números não é qualidade, é dificuldade do conjunto.
+
+O que isso não invalida: os **zeros**. "Nenhuma quantidade confirmada e errada em 536" continua sendo uma propriedade do motor e não do conjunto — um teto de zero é difícil de acertar por sorte, e as folhas do *lote* foram feitas de propósito para quebrá-lo. E continua não invalidando o raciocínio deste ensaio, que é sobre como decidir, não sobre a porcentagem.
+
+O que isso invalida é a frase que eu escrevi na abertura. A medida que faltava agora existe e se chama `npm run aferir`: ela pega uma prancha de verdade, desenha um recorte de **cada ocorrência que o Orcer contou** a partir dos traços do próprio PDF, e pede que uma pessoa olhe e diga se confere. Nada sai do computador — nem precisa, porque o que se compartilha é o veredito, não o desenho. Enquanto ninguém rodar isso numa prancha real, o número honesto deste projeto é: **não sei**.
 
 ## O que "pronto" quer dizer aqui
 

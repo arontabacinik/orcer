@@ -4,7 +4,11 @@
 
 Tudo roda no navegador: o PDF não sai do computador de quem usa.
 
-## Números (medidos, não prometidos)
+## Números (medidos — e medidos em quê)
+
+> **Leia isto antes da tabela.** Todas as 536 folhas abaixo foram **geradas por `bench/gerar`**: o gabarito é exato porque o mesmo script que desenhou a folha escreveu o gabarito. Isso mede o motor contra as convenções do gerador, não contra uma prancha de verdade. **Nenhum número desta página foi medido numa prancha real** — nem um. A referência publicada para detecção de símbolo em prancha real está na casa de **79% de mAP** ([IJDAR 2025](https://rgu-repository.worktribe.com/output/2418851/towards-fully-automated-processing-and-analysis-of-construction-diagrams-ai-powered-symbol-detection)); qualquer coisa perto de 95% num conjunto próprio quer dizer que o conjunto é fácil, não que o motor é bom.
+>
+> Para medir em prancha de verdade — a sua, sem que ela saia do seu computador — existe `npm run aferir`, mais abaixo.
 
 | conjunto | itens | quantidade exata | confirmados errados |
 |---|---:|---:|---:|
@@ -14,11 +18,11 @@ Tudo roda no navegador: o PDF não sai do computador de quem usa.
 | sintéticas (gabarito por camada) | 88 | 88 · 100% | 0 |
 | **total** | **536** | **508 · 94,8%** | **0** |
 
-### Numa prancha que ele nunca viu
+### Nas folhas geradas que não foram usadas para ajustar
 
 O número acima diz se a quantidade está **certa**. Este diz quanto o Orcer se **compromete** — porque uma lista em que um terço das linhas pede conferência custa quase o trabalho que deveria poupar.
 
-Em 50 folhas de teste, contando como resposta firme a linha que a pessoa não precisa conferir (**Confirmado**, com quantidade, ou **Zero**, não tem na planta):
+Em 50 folhas **geradas**, contando como resposta firme a linha que a pessoa não precisa conferir (**Confirmado**, com quantidade, ou **Zero**, não tem na planta):
 
 | | |
 |---|---:|
@@ -36,6 +40,20 @@ E os 28 que sobraram? **Todos os 28 se resolvem apontando um exemplar na planta*
 Metros de rota (eletroduto, eletrocalha) a até 2%: 40 de 44. Legenda em 80 folhas nunca vistas: 99% dos itens achados, 100% do que foi entregue é item de verdade. Em 144 folhas de pranchas públicas reais: nenhum texto de lixo confirmado como material.
 
 **"Confirmado" quer dizer "pode comprar".** Quando o Orcer não tem certeza, a linha vem como **Revisar**, com o motivo e as ocorrências marcadas na planta — nunca um número confiante e errado. Nenhum dos 536 itens saiu confirmado e errado.
+
+## Aferir numa prancha de verdade
+
+O benchmark não sabe o que é uma prancha real. Esta é a medida que sabe, e ela roda na sua máquina:
+
+```bash
+npm run aferir -- ~/pranchas/*.pdf          # gera aferir/<arquivo>.html
+# abra no navegador, olhe item por item, clique confere / não confere, baixe o julgamento
+npm run aferir -- --resumo aferir/*.json    # o número real
+```
+
+Cada bloco mostra o ícone da legenda e **um recorte de cada ocorrência que o Orcer contou**, desenhado a partir dos traços do próprio PDF — é o que o motor enxergou, não uma foto. Você olha e diz se a afirmação está certa.
+
+**Nada sai do computador.** O PDF é lido localmente, os recortes são SVG gerados na hora, a página é um arquivo solto e o julgamento é um JSON que você baixa. Só o JSON precisa ser compartilhado, e ele não contém nenhum desenho — só nomes de item, quantidades e o seu veredito.
 
 ## Rodar
 
@@ -57,6 +75,7 @@ npm run contar -- prancha.pdf [outra.pdf ...] [--csv lista.csv]
 Testes e medição:
 
 ```bash
+npm run aferir -- x.pdf  # medir numa prancha real, com os seus olhos (veja acima)
 npm test             # conferência rápida: exemplo + sintéticas + lote (segundos)
 npm run tela         # o webapp num navegador, servido como a Cloudflare serve: fluxo, CSV, teclado, celular, CSP
 npm run typecheck

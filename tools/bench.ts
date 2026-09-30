@@ -187,7 +187,12 @@ async function contagem(): Promise<boolean> {
     erradas.push(...r.erradas); detalhes.push(...r.detalhe);
   });
   const pct = (a: number, b: number) => (b ? ((100 * a) / b).toFixed(1) + '%' : '—');
-  console.log('\nCONTAGEM — itens com a quantidade exata, cada marca sobre uma ocorrência real\n');
+  console.log('\nCONTAGEM — itens com a quantidade exata, cada marca sobre uma ocorrência real');
+  // A PROCEDÊNCIA FAZ PARTE DO NÚMERO. Toda folha aqui foi GERADA por bench/gerar: o gabarito é exato
+  // porque quem desenhou a folha escreveu o gabarito. Isso mede o motor contra as convenções do gerador,
+  // não contra uma prancha de verdade — e as duas coisas não são a mesma. Nenhum número desta tabela foi
+  // medido em prancha real, e o rodapé existe para que ninguém cite a porcentagem sem essa frase junto.
+  console.log('(folhas geradas por bench/gerar — não é medida em prancha real: `npm run aferir`)\n');
   console.log('conjunto'.padEnd(14) + ['folhas', 'itens', 'exatos', '%', 'confirmados', 'confirm. errados'].map((c) => c.padStart(17)).join(''));
   const tot = { folhas: 0, itens: 0, exatos: 0, alta: 0, altaErrada: 0, metros: 0, metrosExatos: 0 };
   for (const k of ['normal', 'dificil', 'lote', 'sinteticas']) {
@@ -295,7 +300,7 @@ async function firmeza(): Promise<boolean> {
   });
   const pior = Math.max(0, ...porRev.keys());
   const folhas = [...porRev.values()].reduce((a, b) => a + b, 0);
-  console.log(`\nFIRMEZA — ${folhas} folhas: quanto sai sem pedir revisão?`);
+  console.log(`\nFIRMEZA — ${folhas} folhas GERADAS: quanto sai sem pedir revisão?`);
   console.log(`${firmes} de ${itens} itens com resposta firme (${((100 * firmes) / itens).toFixed(1)}%) · ${porRev.get(0) || 0} folhas não deixam nada para conferir · a pior deixa ${pior}  (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
   console.log('folhas por itens deixados em Revisar: ' + [...porRev.entries()].sort((a, b) => a[0] - b[0]).map(([k, v]) => `${k}: ${v}`).join(' · '));
   if (process.env.V && sobrando.length) { console.log(`\no que sobrou para conferir (${sobrando.length}):`); sobrando.sort().forEach((x) => console.log('  ' + x)); }
