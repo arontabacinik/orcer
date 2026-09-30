@@ -9,6 +9,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "deploy": "npm run build && npx --yes wrangler@4.143.0 pages deploy --branch=main",
+    "deploy:workers": "npm run build && npx --yes wrangler@4.143.0 deploy -c wrangler.workers.toml",
     "typecheck": "tsc --noEmit",
     "contar": "tsx tools/contar.ts",
     "bench": "tsx tools/bench.ts",

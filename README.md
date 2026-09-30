@@ -96,17 +96,24 @@ bench/        gabaritos e geradores (veja bench/README.md)
 
 O Orcer é estático: `npm run build` gera `dist/` e qualquer hospedagem serve. Nenhum PDF passa por servidor nenhum — o motor roda no navegador de quem usa.
 
-**Cloudflare Pages**, já configurado (`wrangler.toml`, projeto `orcer`):
+Dois caminhos na Cloudflare, os dois já configurados. Escolha **um** — cada um publica num endereço:
 
 ```bash
-npm run deploy       # build + wrangler pages deploy (precisa estar autenticado)
+npx wrangler login       # uma vez, abre o navegador
+
+npm run deploy           # Pages   -> orcer.pages.dev          (wrangler.toml)
+npm run deploy:workers   # Workers -> orcer.<conta>.workers.dev (wrangler.workers.toml)
 ```
 
-Ou automático, a cada push no `main`, por `.github/workflows/deploy.yml` — que roda `npm run build` e `npm test` antes de publicar. Para ligar, dois segredos em *Settings → Secrets and variables → Actions*:
+> `wrangler deploy` sozinho **não** funciona: com `wrangler.toml` de Pages ele avisa
+> *"you have run `wrangler deploy` on a Pages project"* e para em *Missing entry-point*.
+> Para Workers é preciso o `-c wrangler.workers.toml`, que é o que o script faz.
+
+Ou automático, a cada push no `main`, por `.github/workflows/deploy.yml` — que roda `npm run build`, `npm test` e `npm run tela` (o webapp num navegador de verdade) antes de publicar, **no Pages**. Para que a automação publique no Workers, troque a última linha do workflow por `npm run deploy:workers`. Para ligar, dois segredos em *Settings → Secrets and variables → Actions*:
 
 | segredo | o que é |
 |---|---|
-| `CLOUDFLARE_API_TOKEN` | token com a permissão **Cloudflare Pages: Edit** |
+| `CLOUDFLARE_API_TOKEN` | token com a permissão **Cloudflare Pages: Edit** (ou **Workers Scripts: Edit**, se for pelo Workers) |
 | `CLOUDFLARE_ACCOUNT_ID` | o Account ID da conta Cloudflare |
 
 O primeiro deploy cria o projeto Pages sozinho. O endereço sai como `orcer.pages.dev`.
