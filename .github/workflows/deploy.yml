@@ -40,6 +40,11 @@ jobs:
       # um deploy que quebrou a contagem
       - run: npm test
 
+      # e a TELA, num navegador de verdade: o fluxo inteiro, o CSV, o teclado e o celular.
+      # não adianta o motor estar certo se a página não abre.
+      - run: npx playwright install --with-deps chromium
+      - run: npm run tela
+
       - name: Publicar no Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

@@ -24,7 +24,7 @@ const require = createRequire(import.meta.url);
 const PAR = Math.max(1, +(process.env.PAR || 4));
 
 // META: o que foi medido na versão final (29/09/2026) e não pode cair
-const META = { pecas: 0.94, altaErrada: 0, legendaPerfeitas: 66, lixoAlta: 0, semSaida: 0 };
+const META = { pecas: 0.94, altaErrada: 0, confirmados: 384, legendaPerfeitas: 66, lixoAlta: 0, semSaida: 0 };
 
 const norm = (s: string) => (s || '').toUpperCase().normalize('NFD').replace(/[^A-Z0-9]/g, '');
 const iou = (a: number[], b: number[]) => { const x0 = Math.max(a[0], b[0]), y0 = Math.max(a[1], b[1]), x1 = Math.min(a[2], b[2]), y1 = Math.min(a[3], b[3]); const i = Math.max(0, x1 - x0) * Math.max(0, y1 - y0); const u = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - i; return u > 0 ? i / u : 0; };
@@ -39,7 +39,7 @@ async function filho(pdf: string, pag?: string) {
     pagina: f.pageNum, raster: !!f.raster, prims: f.prims.length,
     itens: f.result!.items.map((it) => ({
       idx: it.idx, nome: (it.name || '').replace(/\s+/g, ' ').trim(), bbox: it.bbox, qtd: typeof it.qty === 'number' ? +it.qty.toFixed(2) : null,
-      unidade: it.unit, conf: it.conf, tipo: it.sw && it.sw.type,
+      unidade: it.unit, conf: it.conf, tipo: it.sw && it.sw.type, nota: it.note,
       marcas: (it.marks || []).map((b) => [+((b[0] + b[2]) / 2).toFixed(1), +((b[1] + b[3]) / 2).toFixed(1), +Math.max(b[2] - b[0], b[3] - b[1]).toFixed(1)]),
       camadas: it.foundLayers || (it.sw && it.sw.routeLayers) || [],
     })),
@@ -202,6 +202,9 @@ async function contagem(): Promise<boolean> {
   const cheio = quais.length === 4;
   if (erradas.length > META.altaErrada) { ok = false; console.log(`\nFALHOU: ${erradas.length} quantidade(s) CONFIRMADA(S) errada(s) — o teto é 0:`); erradas.forEach((e) => console.log('  ' + e)); }
   if (cheio && tot.exatos / tot.itens < META.pecas) { ok = false; console.log(`\nFALHOU: ${pct(tot.exatos, tot.itens)} de itens exatos — a meta é ${META.pecas * 100}%`); }
+  // o que o Orcer afirma sem pedir revisão também não pode cair: um motor que passa a duvidar de tudo
+  // fica "certo" e inútil
+  if (cheio && tot.alta < META.confirmados) { ok = false; console.log(`\nFALHOU: ${tot.alta} itens confirmados — o piso é ${META.confirmados}`); }
   if (quebradas.length) ok = false;
   return ok;
 }

@@ -317,7 +317,7 @@ function baixarCsv() {
 }
 
 // ---------------------------------------------------------------- ligações
-$('#versao').textContent = 'v' + (import.meta.env.VITE_VERSAO || '1.0');
+$('#versao').textContent = 'v' + __VERSAO__;
 const input = $<HTMLInputElement>('#arquivo');
 input.onchange = async () => { const fs = [...(input.files || [])]; input.value = ''; await abrir(await Promise.all(fs.map(async (f) => ({ nome: f.name, dados: await f.arrayBuffer() })))); };
 $('#solte').addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });

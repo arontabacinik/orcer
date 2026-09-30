@@ -239,14 +239,28 @@
     // 3) a medida: ida e volta, densas
     const measure = P => {
       const s = P.s, tol = Math.max(PISO, TOL * ic.S * s);
-      let fw = 0; const cores = new Set(), usados = new Set();
+      let fw = 0; const cores = new Set(), tintas = new Set(), usados = new Set();
       for (let i = 0; i < ic.c.length; i += 2) {
         const q = P.map(ic.c[i], ic.c[i + 1]);
         const r = perto(Mtoca, q[0], q[1]), bp = r.dono;
-        if (r.d <= tol && bp) { fw++; cores.add(colorKey(bp)); usados.add(bp._orig || bp); }
+        if (r.d <= tol && bp) {
+          fw++; cores.add(colorKey(bp)); usados.add(bp._orig || bp);
+          for (const c of [bp.stroke, bp.fill]) if (c && !isNeutral(c)) tintas.add(c);
+        }
       }
       fw /= ic.c.length / 2;
-      const meu = (cores.size ? inside.filter(p => cores.has(colorKey(p))) : inside).filter(p => !alheio.has(p) || usados.has(p._orig || p));
+      // A VOLTA olha a tinta DA COR DO SÍMBOLO. Olhando o PAR (traço, preenchimento), um desenho que é o ícone
+      // MAIS UMA MARCA PREENCHIDA da mesma cor passava com volta 1,00 — o triângulo cheio saía da conta por
+      // ter preenchimento, e o ícone "continha" o que não contém. É a convenção mais comum da simbologia
+      // elétrica (a tomada de 20A é a de 10A com a marca dentro), e por ela o Orcer dizia "não sei separar
+      // qual é qual" sobre dois símbolos que separa muito bem.
+      // A abertura vale só para COR NÃO NEUTRA, que é a doutrina do resto do motor: vermelho ali é uma
+      // declaração, preto e cinza estão em toda prancha e não declaram nada. Sem essa cerca, o ícone de traço
+      // preto passava a reivindicar a parede e o mobiliário: medido no lote, o quadro de distribuição caía a
+      // zero em 6 folhas. Alargar a volta só pode RECUSAR mais — nada passa a ser aceito por causa disto.
+      const minhaTinta = p => cores.has(colorKey(p)) ||
+        (p.stroke && tintas.has(p.stroke)) || (p.fill && tintas.has(p.fill));
+      const meu = (cores.size ? inside.filter(minhaTinta) : inside).filter(p => !alheio.has(p) || usados.has(p._orig || p));
       const cm = cloud(meu, sz / 60);
       let rv = 0; for (let i = 0; i < cm.length; i += 2) { const q = P.inv(cm[i], cm[i + 1]); if (perto(ic.malha, q[0], q[1]).d <= tol / s) rv++; }
       rv = cm.length ? rv / (cm.length / 2) : 0;

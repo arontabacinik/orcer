@@ -106,6 +106,8 @@ Onde o benchmark parou:
 | sintéticas (gabarito por camada) | 88 | 88 · 100% | 0 |
 | **total** | **536** | **508 · 94,8%** | **0** |
 
+Desses, **384 saem confirmados** (71,6%) — o resto vem como Revisar, com o motivo escrito.
+
 Os 28 do lote se resolvem todos com um clique. Duas coisas não se resolvem, e vale dizer por que não foram forçadas.
 
 **Os 28 poderiam virar zero automaticamente?** Provavelmente não sem mentir. Nessas folhas, o melhor candidato para os itens que sobram pontua ida 0,66 e volta 0,60 — as formas são genuinamente diferentes. Baixar o limiar automático até pegar esses casos deixa entrar qualquer coisa. Uma versão anterior já tinha medido a alternativa óbvia (atribuir cada desenho órfão ao item cuja forma mais se parece) e registrado o resultado no código: acertava 6 de 18, ou seja, inventaria número em dois terços dos casos. A opção honesta é pedir o clique — e garantir que o clique funcione, que é o que foi feito.
@@ -114,9 +116,23 @@ Os 28 do lote se resolvem todos com um clique. Duas coisas não se resolvem, e v
 
 Uma ressalva sobre o próprio número: o portão das pranchas públicas reais (144 folhas, "nenhum texto de lixo confirmado como material") não pôde rodar nesta sessão, porque esse conjunto não está no repositório. O argumento de que ele continua verde é estrutural, não empírico: as duas alavancas novas só produzem **Revisar**, e o que aquele portão mede é lixo saindo como **Confirmado**. É um argumento bom, mas é um argumento — e a diferença entre um argumento e uma medida é o assunto do projeto inteiro.
 
+## A volta que não olhava o preenchimento
+
+Uma última coisa apareceu só quando fui olhar o **webapp**, e não o benchmark.
+
+A página inicial oferece "ver com um exemplo". O exemplo é uma prancha sintética com sete materiais, e dois deles — a tomada de 10A e a de 20A — saíam em **Revisar**, com o aviso "mesmo desenho, na mesma cor: não sei separar qual é qual". Só que os dois símbolos são visivelmente diferentes: a de 20A é a de 10A **com um triângulo preenchido dentro**. É a convenção mais comum da simbologia elétrica brasileira.
+
+O juiz é quem decide isso, e a volta — "toda a tinta dali cai sobre traço do ícone" — olha só a tinta **da cor do símbolo**, para que hachura ou mobiliário de outra cor passando por baixo não conte. O que estava errado era como a cor era comparada: pelo **par** (traço, preenchimento). O círculo é `vermelho|sem preenchimento`; o triângulo cheio é `vermelho|vermelho`. Pares diferentes — então o triângulo ficava de fora da conta, e o ícone da tomada de 10A "continha" um desenho que não contém. Volta 1,00. Gêmeos.
+
+A correção é uma frase: **cor é a cor, não o par.** Tinta vermelha ali é do símbolo, preenchida ou não. Com uma cerca: só vale para cor **não neutra** — preto e cinza estão em toda prancha e não declaram nada. Sem essa cerca o ícone de traço preto passava a reivindicar a parede, e o quadro de distribuição caía a zero em seis folhas do lote; eu vi isso porque medi antes de acreditar.
+
+Depois disso o exemplo abre com **7 de 7 confirmados**, cada quantidade ainda exata. E a mesma medição rendeu a segunda correção: quando o ícone é uma forma simples demais para provar sozinho (um triângulo, um círculo) e a planta o desenha em outra cor, a **camada** do CAD serve de segunda testemunha — se todas as ocorrências estão numa camada nomeada que nenhum outro item usa, e são três ou mais. Mais 14 itens confirmados no benchmark, zero confirmado errado.
+
+O que me interessa aqui não é o conserto. É que ele estava invisível do lado de dentro: o benchmark cobra a **quantidade**, e a quantidade estava certa o tempo todo — 18 e 8, exatos. O que estava errado era o quanto o Orcer se dizia seguro. Isso não aparece numa tabela de acertos; aparece quando você abre a própria página inicial e o produto parece inseguro sobre o caso mais banal que existe.
+
 ## O que "pronto" quer dizer aqui
 
-Três das quatro coisas feitas nesta versão não foram melhorias no reconhecimento. Uma foi aprender a ler as recusas do próprio motor. Outra foi destravar uma saída que estava trancada por dentro. A terceira foi descobrir que a régua cobrava o que não existia. Nenhuma delas é "o algoritmo ficou mais esperto".
+Quase nada do que foi feito nesta versão foi melhoria no reconhecimento. Uma foi aprender a ler as recusas do próprio motor. Outra foi destravar uma saída que estava trancada por dentro. A terceira foi descobrir que a régua cobrava o que não existia. A quarta foi abrir a página inicial e ver o produto duvidar do caso mais simples que existe. Nenhuma delas é "o algoritmo ficou mais esperto".
 
 Acho que esse é o formato normal de terminar um programa desses, e não a exceção. Um sistema que se recusa a chutar acumula, em vez de erros, **recusas** — e as recusas são dados. O padrão nelas foi o que fechou seis casos. O aviso que o produto dá quando desiste é uma promessa feita ao usuário, e ninguém tinha verificado se ela se cumpre; verificar virou um portão que roda para sempre. E medir o medidor devolveu sete itens que o motor sempre soube ler.
 

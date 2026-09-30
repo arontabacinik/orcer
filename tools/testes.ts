@@ -26,12 +26,16 @@ async function main() {
   const q = ex[0].itens.map((i) => i.qtd);
   conferir('quantidades 18 · 8 · 60 · 15 · 7 · 22,3 m · 24,32 m', JSON.stringify(q) === JSON.stringify([18, 8, 60, 15, 7, 22.3, 24.32]), JSON.stringify(q));
   conferir('unidades un/m', ex[0].itens.map((i) => i.unidade).join() === 'un,un,un,un,un,m,m');
-  conferir('nada confirmado errado (as tomadas vêm em "Revisar")', ex[0].itens.slice(0, 2).every((i) => i.situacao === 'revisar'));
+  // as duas tomadas têm o MESMO círculo; o que as separa é a marca preenchida dentro da de 20A. O juiz
+  // enxerga isso pela volta — e por isso as duas saem confirmadas, cada uma com o seu número.
+  conferir('as duas tomadas, que só diferem pela marca preenchida, saem confirmadas e separadas',
+    ex[0].itens[0].situacao === 'confirmado' && ex[0].itens[1].situacao === 'confirmado',
+    ex[0].itens.slice(0, 2).map((i) => `${i.qtd}=${i.situacao}`).join(' '));
   const csv = gerarCsv([{ arquivo: 'exemplo.pdf', folhas: ex }]);
   conferir('CSV com BOM, ponto e vírgula e vírgula decimal', csv.startsWith('﻿DESCRIÇÃO;QUANTIDADE;UNIDADE;') && csv.includes(';22,3;m;'));
   conferir('CSV com uma linha por material', csv.trim().split(/\r?\n/).length === 1 + ex[0].itens.length);
   const r = resumo(ex);
-  conferir('resumo', r.itens === 7 && r.confirmados === 5 && r.revisar === 2, JSON.stringify(r));
+  conferir('resumo: 7 itens, 7 confirmados, 0 para revisar', r.itens === 7 && r.confirmados === 7 && r.revisar === 0, JSON.stringify(r));
 
   console.log('\nsintéticas do bench — gabarito por camada');
   const dir = path.join(raiz, 'bench/sinteticas');

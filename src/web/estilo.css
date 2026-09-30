@@ -46,7 +46,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .btn:hover { transform: translateY(-1px); }
 .btn.pri { background: var(--grad); border-color: transparent; color: #fff; box-shadow: 0 6px 20px -8px var(--a1); }
 .btn.ghost { background: transparent; }
-.link { background: none; border: 0; padding: 0; color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+/* alvo de toque: 24px é o mínimo para o dedo acertar (WCAG 2.2). O sublinhado fica no mesmo lugar. */
+.link { background: none; border: 0; padding: 6px 4px; margin: -6px -4px; display: inline-block; color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------- início ---------- */
 .inicio { max-width: 1120px; margin: 0 auto; padding: 0 20px; }

@@ -1691,12 +1691,25 @@ import * as IDENTIDADE from "./identidade";
           if (it.ident) {
             // ALTA é IDENTIDADE: toda ocorrência contada é o ícone nos dois sentidos, nenhuma parecida foi recusada,
             // e um ícone de forma pobre (um primitivo só) precisa da COR como segunda testemunha.
-            const J = it.ident, corOk = !it.relaxed && !J.neutro;
+            const J = it.ident;
+            // A CAMADA, a outra testemunha. Um ícone de forma pobre (um primitivo só: um triângulo, um
+            // círculo) não prova nada pela forma, e a doutrina exige uma segunda testemunha — a COR. Mas
+            // quando a planta desenha o símbolo noutra cor, a cor não testemunha e o item caía em Revisar
+            // mesmo com a contagem certa e nenhum parecido recusado: 22 dos 310 itens certos do benchmark.
+            // O CAD declara junto o que é do mesmo material, e uma camada NOMEADA, com TODAS as ocorrências
+            // dentro dela, que nenhum outro item da legenda usa, é uma declaração tão explícita quanto a cor.
+            // Três ocorrências ou mais: uma camada exclusiva com um desenho só pode ser coincidência.
+            const camada = (it.foundLayers || [])[0];
+            const camadaPropria = !!camada && (it.foundLayers || []).length === 1 && !GENERIC_LAYER_RE.test(camada)
+              && it.qty >= 3
+              && !pointItems.some(o => o !== it && o.twinOf == null && (o.foundLayers || []).includes(camada));
+            const corOk = (!it.relaxed && !J.neutro) || camadaPropria;
             // a pessoa é testemunha: apontou o molde, ou olhou e confirmou
             const pessoa = !!(it.molde || (opts.confirmar && opts.confirmar[it.idx]));
             conf = "ALTA";
             if (J.rej) { conf = "MEDIA"; notes.push(J.rej + " desenho(s) parecido(s) ficaram de fora (" + it.duvidas[0].why + "): confira se algum é este material."); }
             if (J.pobre && !corOk && !pessoa) { conf = "MEDIA"; notes.push("O ícone é uma forma simples e " + (it.relaxed ? "a cor da planta difere da legenda" : "não tem cor própria") + ": outra coisa da planta pode ter o mesmo desenho. Confira."); }
+            else if (J.pobre && camadaPropria && !(!it.relaxed && !J.neutro)) notes.push("Ícone de forma simples: quem separa é a camada " + camada + ", que só este item usa.");
             if (it.gemeos && it.gemeos.size && !(opts.confirmar && opts.confirmar[it.idx])) { conf = "MEDIA"; notes.push("Mesmo desenho de “" + [...it.gemeos.values()].map(g => (opts.names && opts.names[g.idx]) || g.name || "outro item").join("”, “") + "”, na mesma cor: não sei separar qual é qual. Confira."); }
             const auto = !!(it.molde && opts.moldeAuto && opts.moldeAuto[it.idx]);
             if (it.molde && !auto) notes.push("Contado pelo desenho que você apontou na planta.");
