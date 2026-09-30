@@ -104,6 +104,19 @@ async function main() {
     await p.waitForTimeout(400);
     conferir('“Nova leitura” volta para o início', await p.isVisible('#solte'));
 
+    console.log('\no ensaio, como página do site');
+    const e = await b.newPage({ viewport: { width: 1100, height: 900 } });
+    vigiar(e, ruido);
+    await e.goto(BASE + 'ensaio.html', { waitUntil: 'networkidle' });
+    conferir('o ensaio abre e tem as seções', (await e.$$('h2')).length >= 8, String((await e.$$('h2')).length));
+    conferir('as tabelas e o bloco de código viraram HTML', (await e.$$('table')).length >= 3 && (await e.$$('pre')).length >= 1);
+    conferir('não sobrou markdown cru na página', !(await e.evaluate(() => /\*\*|\]\(http/.test(document.body.innerText))));
+    conferir('dá para voltar ao app', (await e.getAttribute('.topo a', 'href')) === './');
+    await e.setViewportSize({ width: 390, height: 844 });
+    await e.waitForTimeout(200);
+    conferir('o ensaio não rola de lado no celular', !(await e.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)));
+    await e.close();
+
     console.log('\nno celular');
     const m = await b.newPage({ viewport: { width: 390, height: 844 } });
     vigiar(m, ruido);

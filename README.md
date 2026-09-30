@@ -122,6 +122,8 @@ O primeiro deploy cria o projeto Pages sozinho. O endereço sai como `orcer.page
 
 [**O Orcer e a recusa repetida**](ENSAIO.md) — como o motor chegou a 508/536, por que os 28 que sobram se resolvem com um clique, e o que foi preciso descobrir sobre o próprio benchmark para saber que os números estavam certos.
 
+`ENSAIO.md` é a fonte única: `npm run build` o converte em `dist/ensaio.html`, uma página do próprio site (mesmas cores, claro e escuro), ligada no rodapé da página inicial. Quem publica o app publica o ensaio junto. O conversor (`tools/ensaio.ts`) cobre só o que o ensaio usa e **falha o build** se o texto passar a usar algo que ele não sabe converter, em vez de publicar errado calado.
+
 ## Privacidade
 
 Plantas de cliente são intocáveis: nunca entram neste repositório, nos testes nem no bench. Os testes usam só folhas geradas (`bench/gerar`), o exemplo em `public/exemplos` e pranchas públicas de editais (`plans-externas.zip`, fora do repositório).

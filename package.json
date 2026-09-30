@@ -6,7 +6,7 @@
   "description": "Orcer — solte a prancha, receba a lista de materiais. Lê a legenda (símbolo + texto), conta cada símbolo na planta e entrega o CSV. Roda no navegador.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && tsx tools/ensaio.ts",
     "preview": "vite preview",
     "deploy": "npm run build && npx --yes wrangler@4.143.0 pages deploy --branch=main",
     "deploy:workers": "npm run build && npx --yes wrangler@4.143.0 deploy -c wrangler.workers.toml",

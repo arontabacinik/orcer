@@ -1,8 +1,8 @@
 # O Orcer e a recusa repetida
 
-*29 de setembro de 2026 · sobre a versão 1.1*
+*30 de setembro de 2026 · sobre a versão 1.1*
 
-O Orcer lê a legenda de um projeto elétrico em PDF, conta cada símbolo na planta e entrega a lista de materiais. Nesta versão ele acerta a quantidade exata de 508 dos 536 itens do benchmark (94,8%) sem ajuda nenhuma, e **zero** dos 536 saiu confirmado e errado. Os 28 que sobraram se resolvem todos apontando um exemplar na planta — não é uma promessa, é um portão do benchmark que roda a cada medição. Este ensaio é sobre a ideia que fechou a maior parte da distância, e sobre o que foi preciso descobrir para saber que ela estava certa.
+O Orcer lê a legenda de um projeto elétrico em PDF, conta cada símbolo na planta e entrega a lista de materiais. Nesta versão ele acerta a quantidade exata de 508 dos 536 itens do benchmark (94,8%) sem ajuda nenhuma, e **zero** dos 536 saiu confirmado e errado. Os 28 que sobraram se resolvem todos apontando um exemplar na planta — não é uma promessa, é um portão do benchmark que roda a cada medição. E numa prancha que ele nunca viu, 94,5% das linhas saem sem pedir revisão. Este ensaio é sobre as ideias que fecharam essa distância, e sobre o que foi preciso descobrir — e recusar — para saber que estavam certas.
 
 ## O contrato
 
