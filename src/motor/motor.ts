@@ -1636,6 +1636,32 @@ import * as IDENTIDADE from "./identidade";
       a.marks = ma; a.qty = ma.length; b.marks = mb; b.qty = mb.length;
       a.porTamanho = b.porTamanho = true;
     }
+    // ---- OLHAR EM VEZ DE SUPOR ----
+    // Duas horas do motor diziam "outra coisa da planta pode ser este desenho" sem nunca perguntar se era.
+    // A régua era o TAMANHO: qualquer desenho repetido sem dono, de porte parecido, bloqueava a resposta —
+    // e numa prancha real sempre sobra alguma coisa do tamanho de um símbolo. Mas o motor TEM um juiz de
+    // identidade; dá para perguntar a ele. `sosiasDe` devolve só o que o juiz consideraria candidato.
+    // O limiar aqui é de DÚVIDA, não de prova: generoso de propósito, bem abaixo do que aceita uma contagem.
+    let ixSobras = null;
+    let orcamento = 400;                                     // teto de julgamentos: folha grande não pode travar
+    const sosiasDe = (it) => {
+      const z = it.bbox ? Math.hypot(it.bbox[2] - it.bbox[0], it.bbox[3] - it.bbox[1]) : 0;
+      if (!z || !sobras.length) return [];
+      const doTamanho = sobras
+        .filter(g => { const b = g.marks[0], d = Math.hypot(b[2] - b[0], b[3] - b[1]); return d >= z * 0.5 && d <= z * 2; })
+        .sort((a, b) => b.marks.length - a.marks.length).slice(0, 10);
+      if (!doTamanho.length) return [];
+      if (!IDm || opts.semJuiz || !it.prims || !it.prims.length || orcamento <= 0) return doTamanho;
+      const ic = it._icSos !== undefined ? it._icSos : (it._icSos = IDm.icon(it.prims));
+      if (!ic) return doTamanho;
+      ixSobras = ixSobras || IDm.index(drawPrims);
+      return doTamanho.filter(g => {
+        if (orcamento-- <= 0) return true;                   // sem orçamento, a dúvida fica de pé
+        const v = IDm.verify(ic, g.marks[0], ixSobras);
+        return v.ok || (Math.max(v.fw, v.rv) >= 0.75 && Math.min(v.fw, v.rv) >= 0.45);
+      });
+    };
+
     // ---- confidence ----
     for (const it of items) {
       const notes = [];
@@ -1681,10 +1707,9 @@ import * as IDENTIDADE from "./identidade";
         else if (it.qty === 0) {
           // "não compre" exige que houvesse ONDE procurar: se sobrou na planta desenho repetido do tamanho deste
           // ícone e sem dono, o zero não está verificado — é "não achei". (Doutrina do Orcer v1: o sósia derruba o zero.)
-          const z = it.bbox ? Math.hypot(it.bbox[2] - it.bbox[0], it.bbox[3] - it.bbox[1]) : 0;
-          const sosias = z ? sobras.filter(g => { const b = g.marks[0], d = Math.hypot(b[2] - b[0], b[3] - b[1]); return d >= z * 0.5 && d <= z * 2; }) : [];
-          if (sosias.length) { conf = "MEDIA"; notes.push("Não achei este símbolo, mas sobraram " + sosias.reduce((a, g) => a + g.marks.length, 0) + " desenho(s) repetido(s) sem dono, do tamanho dele. Aponte um na planta se for este material — isto não é zero."); }
-          else { conf = "ZERO"; notes.push("Nenhuma ocorrência deste símbolo fora da legenda, e nenhum desenho repetido sem dono que pudesse ser ele."); }
+          const sosias = sosiasDe(it);
+          if (sosias.length) { conf = "MEDIA"; notes.push("Não achei este símbolo, mas sobraram " + sosias.reduce((a, g) => a + g.marks.length, 0) + " desenho(s) repetido(s) sem dono que podem ser ele. Aponte um na planta se for este material — isto não é zero."); }
+          else { conf = "ZERO"; notes.push("Nenhuma ocorrência deste símbolo fora da legenda, e nada que sobrou na planta se parece com ele."); }
         }
         else {
           notes.push(it.qty + " ocorrência(s) encontrada(s)" + (it.onLayer > 0.99 && it.sw.mainLayer && !/^\d+R$/.test(it.sw.mainLayer) ? " · camada " + it.sw.mainLayer : ""));
@@ -1703,13 +1728,31 @@ import * as IDENTIDADE from "./identidade";
             const camadaPropria = !!camada && (it.foundLayers || []).length === 1 && !GENERIC_LAYER_RE.test(camada)
               && it.qty >= 3
               && !pointItems.some(o => o !== it && o.twinOf == null && (o.foundLayers || []).includes(camada));
-            const corOk = (!it.relaxed && !J.neutro) || camadaPropria;
+            // E a EXAUSTÃO. O medo por trás da regra é "outra coisa da planta pode ter o mesmo desenho".
+            // Isso se verifica: se nada que sobrou na planta sem dono passaria pelo juiz como este ícone,
+            // então não há outra coisa — todas as ocorrências daquele desenho já estão nesta linha. Vale só
+            // com o juiz limpo (nenhum parecido recusado) e três ocorrências ou mais.
+            const soEu = J.rej === 0 && it.qty >= 3 && sosiasDe(it).length === 0;
+            const corOk = (!it.relaxed && !J.neutro) || camadaPropria || soEu;
             // a pessoa é testemunha: apontou o molde, ou olhou e confirmou
             const pessoa = !!(it.molde || (opts.confirmar && opts.confirmar[it.idx]));
             conf = "ALTA";
-            if (J.rej) { conf = "MEDIA"; notes.push(J.rej + " desenho(s) parecido(s) ficaram de fora (" + it.duvidas[0].why + "): confira se algum é este material."); }
+            // A RECUSA QUE IMPORTA É A QUE QUASE PASSOU. Qualquer recusa derrubava a confiança, e o gerador
+            // de candidatos propõe muita coisa que não chega perto: um traço de parede com 25% do ícone não
+            // é uma ocorrência perdida, é ruído da proposta.
+            // Medido nos três conjuntos, pela recusada que mais quase passou (o min entre ida e volta):
+            //   itens com a CONTAGEM CERTA (45): 9 deles têm a melhor recusada abaixo de 0,50;
+            //   itens a quem FALTOU ocorrência (9): a melhor recusada NUNCA fica abaixo de 0,62;
+            //   item com ocorrência A MAIS (1): 0,92.
+            // Um corte em 0,50 separa os dois grupos sem tocar em nenhum errado — e é por isso que ele é
+            // 0,50 e não 0,70: em 0,70 entrariam 6 dos 9 itens a quem faltou ocorrência. Não repita.
+            const recusaPerto = J.rej ? Math.max.apply(null, it.duvidas.map(d => Math.min(d.fw || 0, d.rv || 0))) : 0;
+            if (J.rej && recusaPerto >= 0.5) { conf = "MEDIA"; notes.push(J.rej + " desenho(s) parecido(s) ficaram de fora (" + it.duvidas[0].why + "): confira se algum é este material."); }
+            else if (J.rej) notes.push(J.rej + " desenho(s) parecido(s) ficaram de fora, nenhum chegou perto de ser ele (o melhor tem " + Math.round(recusaPerto * 100) + "% do ícone).");
             if (J.pobre && !corOk && !pessoa) { conf = "MEDIA"; notes.push("O ícone é uma forma simples e " + (it.relaxed ? "a cor da planta difere da legenda" : "não tem cor própria") + ": outra coisa da planta pode ter o mesmo desenho. Confira."); }
-            else if (J.pobre && camadaPropria && !(!it.relaxed && !J.neutro)) notes.push("Ícone de forma simples: quem separa é a camada " + camada + ", que só este item usa.");
+            else if (J.pobre && !(!it.relaxed && !J.neutro)) notes.push(camadaPropria
+              ? "Ícone de forma simples: quem separa é a camada " + camada + ", que só este item usa."
+              : "Ícone de forma simples, mas não sobrou na planta nenhum desenho sem dono que pudesse ser ele: as ocorrências deste desenho estão todas aqui.");
             if (it.gemeos && it.gemeos.size && !(opts.confirmar && opts.confirmar[it.idx])) { conf = "MEDIA"; notes.push("Mesmo desenho de “" + [...it.gemeos.values()].map(g => (opts.names && opts.names[g.idx]) || g.name || "outro item").join("”, “") + "”, na mesma cor: não sei separar qual é qual. Confira."); }
             const auto = !!(it.molde && opts.moldeAuto && opts.moldeAuto[it.idx]);
             if (it.molde && !auto) notes.push("Contado pelo desenho que você apontou na planta.");

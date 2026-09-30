@@ -2,6 +2,7 @@
 //
 //   npm run bench                 contagem + clique + legenda + lista de compra real (se houver as públicas)
 //   npm run bench -- contagem     só a contagem         env: SET=normal,dificil,lote,sinteticas  PAR=4  V=1
+//   npm run bench -- firmeza      quanto de uma prancha desconhecida sai sem pedir revisão
 //   npm run bench -- clique       o que ficou em Revisar: apontar UM exemplar na planta resolve?
 //   npm run bench -- legenda      80 folhas inéditas: a legenda foi lida inteira, com o texto certo?
 //   npm run bench -- lista        21 pranchas públicas reais: nenhum lixo sai como "confirmado"
@@ -24,7 +25,7 @@ const require = createRequire(import.meta.url);
 const PAR = Math.max(1, +(process.env.PAR || 4));
 
 // META: o que foi medido na versão final (29/09/2026) e não pode cair
-const META = { pecas: 0.94, altaErrada: 0, confirmados: 384, legendaPerfeitas: 66, lixoAlta: 0, semSaida: 0 };
+const META = { pecas: 0.94, altaErrada: 0, confirmados: 405, firmes: 0.94, piorFolha: 2, zeroErrado: 0, legendaPerfeitas: 66, lixoAlta: 0, semSaida: 0 };
 
 const norm = (s: string) => (s || '').toUpperCase().normalize('NFD').replace(/[^A-Z0-9]/g, '');
 const iou = (a: number[], b: number[]) => { const x0 = Math.max(a[0], b[0]), y0 = Math.max(a[1], b[1]), x1 = Math.min(a[2], b[2]), y1 = Math.min(a[3], b[3]); const i = Math.max(0, x1 - x0) * Math.max(0, y1 - y0); const u = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - i; return u > 0 ? i / u : 0; };
@@ -40,6 +41,7 @@ async function filho(pdf: string, pag?: string) {
     itens: f.result!.items.map((it) => ({
       idx: it.idx, nome: (it.name || '').replace(/\s+/g, ' ').trim(), bbox: it.bbox, qtd: typeof it.qty === 'number' ? +it.qty.toFixed(2) : null,
       unidade: it.unit, conf: it.conf, tipo: it.sw && it.sw.type, nota: it.note,
+      recusadas: (it.duvidas || []).map((d) => [+(d.fw || 0).toFixed(3), +(d.rv || 0).toFixed(3)]),
       marcas: (it.marks || []).map((b) => [+((b[0] + b[2]) / 2).toFixed(1), +((b[1] + b[3]) / 2).toFixed(1), +Math.max(b[2] - b[0], b[3] - b[1]).toFixed(1)]),
       camadas: it.foundLayers || (it.sw && it.sw.routeLayers) || [],
     })),
@@ -258,6 +260,52 @@ async function clique(): Promise<boolean> {
   return true;
 }
 
+// ---------------- FIRMEZA: quanto de uma prancha desconhecida sai sem pedir revisão ----------------
+// A contagem mede se o número está CERTO. Isto mede quanto o Orcer se compromete: uma lista em que um
+// terço das linhas diz "confira" custa quase o trabalho que ela deveria poupar. Resposta FIRME = a linha
+// que a pessoa não precisa conferir: **Confirmado** (com quantidade) ou **Zero** (não tem na planta).
+// Fora daqui fica o conjunto `lote`, feito de propósito para que o desenho da planta NÃO seja o ícone da
+// legenda: ali "Revisar" é a resposta certa, e confirmar seria mentir.
+// Como as folhas têm de 3 a 10 itens, um único "Revisar" já derruba a folha de 100% para 75-88%: a
+// porcentagem por folha não tem granularidade para servir de portão. O que o portão cobra é o trabalho
+// que sobra — quantos itens uma folha deixa para conferir — e isso não depende do tamanho dela.
+async function firmeza(): Promise<boolean> {
+  const quais = (process.env.SET || 'normal,dificil').split(',').filter((q) => q !== 'lote' && q !== 'sinteticas');
+  const L = alvos(quais).filter((S) => S.modo !== 'camada'), t0 = Date.now();
+  let itens = 0, firmes = 0, zeroErrado = 0;
+  const porRev = new Map<number, number>(), sobrando: string[] = [], mentiras: string[] = [];
+  await emParalelo(L, async (S) => {
+    const out = await rodar([S.pdf]);
+    if (out.erro) return;
+    const pred = out.folhas.flatMap((f: any) => f.itens).filter((it: any) => it.tipo !== 'NOTA');
+    const usados = new Set<number>();
+    let n = 0, rev = 0;
+    for (const g of S.itens!) {
+      let k = -1;
+      if (S.modo === 'nome') k = pred.findIndex((p: any, i: number) => !usados.has(i) && norm(p.nome).slice(0, 24) === norm(g.texto).slice(0, 24));
+      else { let melhor = 0; pred.forEach((p: any, i: number) => { if (usados.has(i) || !p.bbox) return; const v = Math.max(iou(g.icone, p.bbox), perto(g.icone, p.bbox) && perto(p.bbox, g.icone) ? 0.5 : 0); if (v > melhor) { melhor = v; k = i; } }); if (melhor < 0.3) k = -1; }
+      if (k < 0) continue; usados.add(k);
+      const p = pred[k]; itens++; n++;
+      // um ZERO sobre item que EXISTE é a mesma mentira que uma quantidade confirmada errada
+      if (p.conf === 'ZERO' && g.n > 0) { zeroErrado++; mentiras.push(`${S.nome} · ${String(g.texto).slice(0, 34)} · gabarito ${g.n} · o motor disse ZERO`); }
+      if (p.conf === 'ALTA' || p.conf === 'ZERO') firmes++;
+      else { rev++; if (process.env.V) sobrando.push(`${S.nome} · ${String(g.texto).slice(0, 34)} · ${(p.nota || '').slice(0, 90)}`); }
+    }
+    if (n) porRev.set(rev, (porRev.get(rev) || 0) + 1);
+  });
+  const pior = Math.max(0, ...porRev.keys());
+  const folhas = [...porRev.values()].reduce((a, b) => a + b, 0);
+  console.log(`\nFIRMEZA — ${folhas} folhas: quanto sai sem pedir revisão?`);
+  console.log(`${firmes} de ${itens} itens com resposta firme (${((100 * firmes) / itens).toFixed(1)}%) · ${porRev.get(0) || 0} folhas não deixam nada para conferir · a pior deixa ${pior}  (${((Date.now() - t0) / 1000).toFixed(0)} s)`);
+  console.log('folhas por itens deixados em Revisar: ' + [...porRev.entries()].sort((a, b) => a[0] - b[0]).map(([k, v]) => `${k}: ${v}`).join(' · '));
+  if (process.env.V && sobrando.length) { console.log(`\no que sobrou para conferir (${sobrando.length}):`); sobrando.sort().forEach((x) => console.log('  ' + x)); }
+  let ok = true;
+  if (zeroErrado > META.zeroErrado) { ok = false; console.log(`\nFALHOU: ${zeroErrado} ZERO(s) sobre item que existe — o teto é ${META.zeroErrado}:`); mentiras.forEach((m) => console.log('  ' + m)); }
+  if (firmes / itens < META.firmes) { ok = false; console.log(`\nFALHOU: ${((100 * firmes) / itens).toFixed(1)}% de respostas firmes — o piso é ${META.firmes * 100}%`); }
+  if (pior > META.piorFolha) { ok = false; console.log(`\nFALHOU: uma folha deixou ${pior} itens para conferir — o teto é ${META.piorFolha}`); }
+  return ok;
+}
+
 // ---------------- LEGENDA (80 folhas inéditas) ----------------
 function lev(a: string, b: string) { const m = a.length, n = b.length; if (!m) return n; if (!n) return m; let p = Array.from({ length: n + 1 }, (_, j) => j); for (let i = 1; i <= m; i++) { const c = [i]; for (let j = 1; j <= n; j++) c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)); p = c; } return p[n]; }
 const normT = (t: string) => (t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
@@ -322,6 +370,7 @@ async function main() {
   const qual = process.argv[2] || 'tudo';
   const r: (boolean | null)[] = [];
   if (qual === 'tudo' || qual === 'contagem') r.push(await contagem());
+  if (qual === 'tudo' || qual === 'firmeza') r.push(await firmeza());
   if (qual === 'tudo' || qual === 'clique') r.push(await clique());
   if (qual === 'tudo' || qual === 'legenda') r.push(await legenda());
   if (qual === 'tudo' || qual === 'lista') r.push(await lista());

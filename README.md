@@ -14,7 +14,22 @@ Tudo roda no navegador: o PDF não sai do computador de quem usa.
 | sintéticas (gabarito por camada) | 88 | 88 · 100% | 0 |
 | **total** | **536** | **508 · 94,8%** | **0** |
 
-Dos 536, **384 saem confirmados** — número que a pessoa não precisa conferir. O resto vem como **Revisar**, com o motivo escrito e as ocorrências marcadas.
+### Numa prancha que ele nunca viu
+
+O número acima diz se a quantidade está **certa**. Este diz quanto o Orcer se **compromete** — porque uma lista em que um terço das linhas pede conferência custa quase o trabalho que deveria poupar.
+
+Em 50 folhas de teste, contando como resposta firme a linha que a pessoa não precisa conferir (**Confirmado**, com quantidade, ou **Zero**, não tem na planta):
+
+| | |
+|---|---:|
+| itens com resposta firme | **310 de 328 · 94,5%** |
+| folhas que não deixam nada para conferir | **34 de 50** |
+| o que a pior folha deixa | **2 itens** |
+| quantidades confirmadas erradas · zeros sobre item que existe | **0 · 0** |
+
+As folhas têm de 3 a 10 itens, então um único "Revisar" já leva a folha de 100% para 75-88%: a porcentagem por folha não tem granularidade para servir de meta. O que o portão `npm run bench -- firmeza` cobra é o **trabalho que sobra** — quantos itens a folha deixa para conferir —, e isso não depende do tamanho dela.
+
+O conjunto *lote* fica fora dessa conta: ele é feito de propósito para que o desenho da planta **não** seja o ícone da legenda, e ali "Revisar" é a resposta certa. Confirmar seria mentir.
 
 E os 28 que sobraram? **Todos os 28 se resolvem apontando um exemplar na planta** — um clique por item, medido, não prometido (`npm run bench -- clique`). Sozinho o Orcer acerta 94,8%; com um clique no que ele mesmo marcou como Revisar, 536 de 536.
 
@@ -45,7 +60,7 @@ Testes e medição:
 npm test             # conferência rápida: exemplo + sintéticas + lote (segundos)
 npm run tela         # o webapp de ponta a ponta num navegador: fluxo, CSV, teclado, celular
 npm run typecheck
-npm run bench        # medição completa: contagem, clique, legenda e lista. Veja bench/README.md
+npm run bench        # medição completa: contagem, firmeza, clique, legenda e lista. Veja bench/README.md
 ```
 
 ## Como funciona

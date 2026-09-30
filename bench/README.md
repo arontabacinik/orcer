@@ -1,15 +1,18 @@
 # Bench
 
-`npm run bench` mede quatro coisas e falha se algum portão ficar vermelho:
+`npm run bench` mede cinco coisas e falha se algum portão ficar vermelho:
 
 | subcomando | o que mede | portão |
 |---|---|---|
 | `contagem` | quantidade exata por item em 102 folhas com gabarito | ≥ 94% exatos · 0 confirmados errados |
+| `firmeza` | quanto de uma prancha desconhecida sai sem pedir revisão | ≥ 94% firmes · pior folha deixa ≤ 2 · 0 zeros errados |
 | `clique` | o que ficou em Revisar: apontar UM exemplar resolve? | 0 itens sem saída |
 | `legenda` | itens da legenda em 80 folhas nunca vistas (`legenda/`) | ≥ 66 folhas perfeitas · 0 lixo |
 | `lista` | 144 folhas de pranchas públicas reais | 0 lixo confirmado |
 
 `npm run bench -- contagem` roda só um. Variáveis: `SET=normal,dificil,lote,sinteticas`, `PAR=4` (processos em paralelo), `V=1` (detalhe por item).
+
+A `firmeza` é a outra metade da `contagem`. A contagem mede se o número está **certo**; a firmeza mede quanto o Orcer se **compromete** — quantas linhas saem sem pedir conferência. Um motor que passa a duvidar de tudo fica "certo" e inútil, e sem esse portão nada segurava isso. Resposta firme = **Confirmado** (com quantidade) ou **Zero** (não tem na planta); um ZERO sobre item que existe conta como mentira, igual a uma quantidade confirmada errada. O conjunto `lote` fica de fora: ali "Revisar" é a resposta certa.
 
 O `clique` fecha o contrato do produto. O Orcer nunca chuta: quando o desenho da planta não é o ícone da legenda, o item vai para **Revisar** e a tela pede "Aponte um na planta". Esse pedido só é honesto se apontar resolver — então todo item que o motor não acertou sozinho recebe um retângulo em volta de UMA ocorrência do gabarito e é julgado pela mesma régua da contagem. O clicador não escolhe pelo resultado: fica com o primeiro retângulo que o motor aceita sem reclamar, e quando o motor reclama ("cortou", "pegou só um traço", "só achei o que você apontou") ele abre um pouco e tenta de novo — que é o que a tela manda a pessoa fazer.
 

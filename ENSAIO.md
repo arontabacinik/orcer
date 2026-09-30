@@ -106,7 +106,7 @@ Onde o benchmark parou:
 | sintéticas (gabarito por camada) | 88 | 88 · 100% | 0 |
 | **total** | **536** | **508 · 94,8%** | **0** |
 
-Desses, **384 saem confirmados** (71,6%) — o resto vem como Revisar, com o motivo escrito.
+Desses, **409 saem confirmados** — e nas folhas em que a planta desenha o que a legenda mostra, 94,5% das linhas saem sem pedir revisão.
 
 Os 28 do lote se resolvem todos com um clique. Duas coisas não se resolvem, e vale dizer por que não foram forçadas.
 
@@ -129,6 +129,35 @@ A correção é uma frase: **cor é a cor, não o par.** Tinta vermelha ali é d
 Depois disso o exemplo abre com **7 de 7 confirmados**, cada quantidade ainda exata. E a mesma medição rendeu a segunda correção: quando o ícone é uma forma simples demais para provar sozinho (um triângulo, um círculo) e a planta o desenha em outra cor, a **camada** do CAD serve de segunda testemunha — se todas as ocorrências estão numa camada nomeada que nenhum outro item usa, e são três ou mais. Mais 14 itens confirmados no benchmark, zero confirmado errado.
 
 O que me interessa aqui não é o conserto. É que ele estava invisível do lado de dentro: o benchmark cobra a **quantidade**, e a quantidade estava certa o tempo todo — 18 e 8, exatos. O que estava errado era o quanto o Orcer se dizia seguro. Isso não aparece numa tabela de acertos; aparece quando você abre a própria página inicial e o produto parece inseguro sobre o caso mais banal que existe.
+
+## Olhar em vez de supor
+
+O pedido seguinte foi o mais difícil de todos: *numa prancha que o Orcer nunca viu, 90% das linhas têm de sair sem pedir revisão*.
+
+Eu já sabia o número: 384 dos 536 itens saíam confirmados — 71,6%. Mas esse número mistura coisas que não se misturam. O conjunto *lote* são 120 itens onde o desenho da planta **não é** o ícone da legenda, de propósito; ali "Revisar" é a resposta certa e confirmar seria exatamente a mentira que o produto promete não contar. Tirando o lote, era 83,7%. Faltavam sete pontos.
+
+Fui ver de onde vinham, e os dois maiores motivos tinham a mesma forma:
+
+- *"O ícone é uma forma simples e a cor da planta difere da legenda: **outra coisa da planta pode ter o mesmo desenho**."*
+- *"Não achei este símbolo, mas sobraram N desenhos repetidos sem dono, **do tamanho dele**."*
+
+Os dois são suposições sobre a planta. E o Orcer tem um juiz de identidade capaz de responder cada uma delas — que não estava sendo consultado. A régua do segundo caso era literalmente a **fita métrica**: qualquer desenho repetido de porte parecido bloqueava a resposta, e numa prancha real sempre sobra alguma coisa do tamanho de um símbolo.
+
+Então passei a perguntar. Para cada um desses itens, o que sobrou sem dono na planta passa pelo juiz como sendo este ícone? Se nada passa, não há "outra coisa": todas as ocorrências daquele desenho já estão naquela linha, por exaustão. Isso é verificação, não suposição, e são 21 itens a mais confirmados sem tocar em nenhum limiar de identidade.
+
+A terceira tentativa foi **recusada pela medida**, e é a que mais gosto. Qualquer recusa do juiz derrubava a confiança do item — mesmo uma recusa a 25%, que não é ocorrência perdida, é ruído do gerador de candidatos. Parecia óbvio exigir que a recusa fosse *próxima* para valer. Mas a régua tem de separar duas populações, e fui medir as duas:
+
+| a recusada que mais quase passou | itens com a contagem certa | itens a quem faltou ocorrência |
+|---|---:|---:|
+| abaixo de 0,50 | 9 | **0** |
+| acima de 0,70 | 23 | 6 |
+| acima de 0,80 | 10 | 6 |
+
+Num corte em 0,70 — o número que a intuição escolhe — eu confirmaria 6 itens a quem de fato faltou ocorrência. Seis mentiras. O corte que existe é 0,50, e ele rende 9 itens, não 23. Ficou escrito no código, com a tabela, para que ninguém tente 0,70 de novo.
+
+O resultado, em 50 folhas que o motor não usou para se ajustar: **310 de 328 itens com resposta firme, 94,5%**. Trinta e quatro das 50 folhas não deixam nada para conferir; a pior deixa dois itens. Nenhuma quantidade confirmada errada, nenhum zero sobre item que existe.
+
+E uma coisa que a medição desmontou: os 90% **por folha** não são uma meta que se possa cobrar. As folhas têm de 3 a 10 itens, então um único "Revisar" leva a folha de 100% direto para 75% ou 88% — não existe 90% nessa escala. O que dá para cobrar, e o que o portão `firmeza` cobra, é o trabalho que sobra: quantos itens a folha deixa para a pessoa conferir. Esse número não depende do tamanho da folha, e hoje ele é **dois, no pior caso**.
 
 ## O que "pronto" quer dizer aqui
 
