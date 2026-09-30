@@ -2,12 +2,15 @@
 //
 // O motor tem benchmark; a tela não tinha nada. Aqui o fluxo inteiro é exercido como uma pessoa faria:
 // abre, pede o exemplo, confere a lista, baixa o CSV, anda pelo teclado, volta ao início — e nada disso
-// pode deixar erro no console. Sobe o dist/ (o que vai para o ar), não o servidor de desenvolvimento.
+// pode deixar erro no console.
+// Serve o dist/ COM OS CABEÇALHOS DE PRODUÇÃO (public/_headers), que é como a Cloudflare vai servir: a CSP
+// mais apertada do mundo passa num servidor que não a envia, então testar sem ela é testar outra coisa.
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawn, type ChildProcess } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import type http from 'node:http';
 import { chromium, type Browser, type Page } from 'playwright';
+import { servir } from './servir';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORTA = +(process.env.PORTA || 4178);
@@ -20,16 +23,11 @@ function conferir(nome: string, cond: boolean, detalhe = '') {
   if (cond) { ok++; console.log('  ✓ ' + nome); } else { falhas++; console.log('  ✗ ' + nome + (detalhe ? ' — ' + detalhe : '')); }
 }
 
-async function servir(): Promise<ChildProcess> {
+async function subir(): Promise<http.Server> {
   if (!fs.existsSync(path.join(RAIZ, 'dist', 'index.html'))) {
     console.error('falta dist/ — rode `npm run build` antes'); process.exit(2);
   }
-  const ch = spawn('npx', ['vite', 'preview', '--port', String(PORTA), '--strictPort'], { cwd: RAIZ, stdio: 'ignore' });
-  for (let i = 0; i < 60; i++) {
-    try { const r = await fetch(BASE); if (r.ok) return ch; } catch { }
-    await new Promise((r) => setTimeout(r, 250));
-  }
-  ch.kill(); console.error(`o preview não subiu em ${BASE}`); process.exit(2);
+  return servir(path.join(RAIZ, 'dist'), PORTA);
 }
 
 /** erros e avisos do console, e requisições que falharam — qualquer um reprova a tela */
@@ -40,7 +38,7 @@ function vigiar(p: Page, saco: string[]) {
 }
 
 async function main() {
-  const servidor = await servir();
+  const servidor = await subir();
   let b: Browser | null = null;
   try {
     b = await chromium.launch(CHROME ? { executablePath: CHROME } : {});
@@ -57,6 +55,11 @@ async function main() {
     conferir(`o rodapé mostra a versão do package.json (v${version})`, versao.trim() === 'v' + version, versao);
     const numeros = await p.$$eval('.prova b', (bs) => bs.map((x) => x.textContent!.trim()));
     conferir('os números da página inicial são os medidos', numeros[0] === '94,8%' && numeros[1] === '0', JSON.stringify(numeros));
+
+    const cab = (await fetch(BASE)).headers;
+    const csp = cab.get('content-security-policy') || '';
+    conferir('a CSP de produção é servida', /connect-src 'self'/.test(csp) && /frame-ancestors 'none'/.test(csp), csp.slice(0, 80));
+    conferir('e os outros cabeçalhos', cab.get('x-content-type-options') === 'nosniff' && cab.get('referrer-policy') === 'no-referrer');
 
     console.log('\nler o exemplo de ponta a ponta');
     const lendo = p.waitForSelector('#tela-lendo:not([hidden])', { timeout: 5000 }).then(() => true).catch(() => false);
@@ -135,7 +138,7 @@ async function main() {
     conferir('nenhum erro nem aviso no console', unicos.length === 0, unicos.join(' | ').slice(0, 300));
   } finally {
     if (b) await b.close();
-    servidor.kill();
+    servidor.close();
   }
   console.log(`\n${ok} ok · ${falhas} falha(s)\n`);
   process.exit(falhas ? 1 : 0);

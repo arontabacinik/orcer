@@ -58,7 +58,7 @@ Testes e medição:
 
 ```bash
 npm test             # conferência rápida: exemplo + sintéticas + lote (segundos)
-npm run tela         # o webapp de ponta a ponta num navegador: fluxo, CSV, teclado, celular
+npm run tela         # o webapp num navegador, servido como a Cloudflare serve: fluxo, CSV, teclado, celular, CSP
 npm run typecheck
 npm run bench        # medição completa: contagem, firmeza, clique, legenda e lista. Veja bench/README.md
 ```
@@ -81,7 +81,9 @@ src/
   ler.ts      lê um PDF folha a folha; folha sem legenda usa a legenda de outra folha do arquivo
   lista.ts    a lista para a tela e o CSV
   web/        o site: main.ts (tela), worker.ts (o motor num Web Worker), estilo.css
-tools/        contar.ts (linha de comando), bench.ts (medição), testes.ts (npm test)
+public/       o que vai cru para o ar: o exemplo e _headers (a CSP)
+tools/        contar.ts (linha de comando), bench.ts (medição), testes.ts, tela.ts,
+              servir.ts (dist/ com os cabeçalhos de produção), ensaio.ts (ENSAIO.md -> página)
 bench/        gabaritos e geradores (veja bench/README.md)
 ```
 
@@ -94,29 +96,27 @@ bench/        gabaritos e geradores (veja bench/README.md)
 
 ## Publicar
 
-O Orcer é estático: `npm run build` gera `dist/` e qualquer hospedagem serve. Nenhum PDF passa por servidor nenhum — o motor roda no navegador de quem usa.
-
-Dois caminhos na Cloudflare, os dois já configurados. Escolha **um** — cada um publica num endereço:
+O Orcer é um projeto Cloudflare: `wrangler.toml` na raiz, Workers com Static Assets sobre o `dist/`. Não há servidor — o Worker só entrega os arquivos.
 
 ```bash
 npx wrangler login       # uma vez, abre o navegador
-
-npm run deploy           # Pages   -> orcer.pages.dev          (wrangler.toml)
-npm run deploy:workers   # Workers -> orcer.<conta>.workers.dev (wrangler.workers.toml)
+npm run deploy           # build + npm test + wrangler deploy
 ```
 
-> `wrangler deploy` sozinho **não** funciona: com `wrangler.toml` de Pages ele avisa
-> *"you have run `wrangler deploy` on a Pages project"* e para em *Missing entry-point*.
-> Para Workers é preciso o `-c wrangler.workers.toml`, que é o que o script faz.
-
-Ou automático, a cada push no `main`, por `.github/workflows/deploy.yml` — que roda `npm run build`, `npm test` e `npm run tela` (o webapp num navegador de verdade) antes de publicar, **no Pages**. Para que a automação publique no Workers, troque a última linha do workflow por `npm run deploy:workers`. Para ligar, dois segredos em *Settings → Secrets and variables → Actions*:
+Ou automático, a cada push no `main`, por `.github/workflows/deploy.yml`, que roda `npm run build`, `npm test` e `npm run tela` antes de publicar. Para ligar, dois segredos em *Settings → Secrets and variables → Actions*:
 
 | segredo | o que é |
 |---|---|
-| `CLOUDFLARE_API_TOKEN` | token com a permissão **Cloudflare Pages: Edit** (ou **Workers Scripts: Edit**, se for pelo Workers) |
+| `CLOUDFLARE_API_TOKEN` | token com a permissão **Workers Scripts: Edit** |
 | `CLOUDFLARE_ACCOUNT_ID` | o Account ID da conta Cloudflare |
 
-O primeiro deploy cria o projeto Pages sozinho. O endereço sai como `orcer.pages.dev`.
+O endereço sai como `orcer.<sua-conta>.workers.dev`.
+
+### O que sai junto com os arquivos
+
+`public/_headers` viaja para o ar com o site. A página inicial promete "o projeto não sai do seu computador"; a política de segurança de conteúdo ali transforma isso numa regra que o **navegador** aplica — `connect-src 'self'` significa que esta página não consegue falar com nenhum outro servidor, nem se alguém conseguir injetar código nela. É a diferença entre prometer e impedir.
+
+Isso não é decorativo: `npm run tela` serve o `dist/` **com esses cabeçalhos** (`tools/servir.ts`), porque a CSP mais apertada do mundo passa num servidor que não a envia. Se a política quebrar o app, o teste acusa antes do deploy.
 
 ## O ensaio
 

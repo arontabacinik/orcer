@@ -1,0 +1,20 @@
+# Cabeçalhos servidos junto com os arquivos (Cloudflare lê este arquivo da pasta publicada).
+#
+# A promessa da página inicial é "o projeto não sai do seu computador". A CSP abaixo transforma isso numa
+# regra que o NAVEGADOR aplica: `connect-src 'self'` significa que esta página não consegue falar com
+# nenhum outro servidor, nem se alguém conseguir injetar código nela. É a diferença entre prometer e impedir.
+#
+# Por que cada folga existe:
+#   'unsafe-inline' em style-src  — a página do ensaio tem <style> embutido, e a tela escreve estilo inline
+#   blob: em worker-src e img-src — o Web Worker do motor e o canvas da prancha
+#   data: em img-src              — o ícone da aba é um SVG embutido
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; worker-src 'self' blob:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Cross-Origin-Opener-Policy: same-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+
+# os arquivos com hash no nome nunca mudam de conteúdo
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

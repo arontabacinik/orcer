@@ -1,5 +1,12 @@
-# Cloudflare Pages — o Orcer é um site estático: `npm run build` gera dist/ e é isso que sobe.
-# Nenhum dado sai do navegador de quem usa; o Pages só serve os arquivos.
+# Cloudflare Workers — o Orcer é um site estático e é assim que ele vai para o ar.
+#
+#   npm run deploy      ->  build + `wrangler deploy`
+#
+# Não há `main`: o Orcer não tem servidor. O Worker só entrega os arquivos de dist/, e os cabeçalhos de
+# public/_headers viajam junto. Nenhum PDF passa por aqui — o motor roda no navegador de quem usa, e a
+# política de segurança do conteúdo (CSP) faz disso uma regra do navegador, não uma promessa nossa.
 name = "orcer"
 compatibility_date = "2026-09-29"
-pages_build_output_dir = "dist"
+
+[assets]
+directory = "./dist"

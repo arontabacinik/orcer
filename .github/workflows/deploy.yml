@@ -1,12 +1,12 @@
-# Publica o Orcer no Cloudflare Pages a cada push no main.
+# Publica o Orcer na Cloudflare (Workers, Static Assets) a cada push no main.
 #
 # Precisa de dois segredos no repositório (Settings → Secrets and variables → Actions):
-#   CLOUDFLARE_API_TOKEN   token com a permissão "Cloudflare Pages: Edit"
+#   CLOUDFLARE_API_TOKEN   token com a permissão "Workers Scripts: Edit"
 #   CLOUDFLARE_ACCOUNT_ID  o Account ID da conta Cloudflare
 # Sem eles o job falha no passo do deploy e nada é publicado.
 #
-# O Orcer é estático: sobe o dist/ e pronto. Nenhum PDF passa por servidor nenhum —
-# o motor roda no navegador de quem usa, aqui e em qualquer hospedagem.
+# O Orcer é estático: sobe o dist/ e pronto. Nenhum PDF passa por servidor nenhum — o motor roda no
+# navegador de quem usa, e os cabeçalhos de public/_headers fazem disso uma regra do navegador.
 name: deploy
 
 on:
@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  pages:
+  cloudflare:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -40,17 +40,13 @@ jobs:
       # um deploy que quebrou a contagem
       - run: npm test
 
-      # e a TELA, num navegador de verdade: o fluxo inteiro, o CSV, o teclado e o celular.
-      # não adianta o motor estar certo se a página não abre.
+      # e a TELA, num navegador de verdade, servindo o dist/ com os cabeçalhos de produção: o fluxo
+      # inteiro, o CSV, o teclado, o celular e a CSP. Não adianta o motor estar certo se a página não abre.
       - run: npx playwright install --with-deps chromium
       - run: npm run tela
 
-      - name: Publicar no Cloudflare Pages
+      - name: Publicar na Cloudflare
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          # cria o projeto na primeira vez; depois disso o comando falha por já existir
-          npx --yes wrangler@4.143.0 pages project create orcer \
-            --production-branch=main || true
-          npx --yes wrangler@4.143.0 pages deploy --branch=main
+        run: npx --yes wrangler@4.143.0 deploy
