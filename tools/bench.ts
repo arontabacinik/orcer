@@ -2,6 +2,7 @@
 //
 //   npm run bench                 contagem + clique + legenda + lista de compra real (se houver as públicas)
 //   npm run bench -- contagem     só a contagem         env: SET=normal,dificil,lote,sinteticas  PAR=4  V=1
+//   npm run bench -- sujas        propriedades de PDF de CAD real: pena como área, detalhe ampliado, recorte
 //   npm run bench -- firmeza      quanto de uma prancha desconhecida sai sem pedir revisão
 //   npm run bench -- clique       o que ficou em Revisar: apontar UM exemplar na planta resolve?
 //   npm run bench -- legenda      80 folhas inéditas: a legenda foi lida inteira, com o texto certo?
@@ -25,7 +26,7 @@ const require = createRequire(import.meta.url);
 const PAR = Math.max(1, +(process.env.PAR || 4));
 
 // META: o que foi medido na versão final (29/09/2026) e não pode cair
-const META = { pecas: 0.94, altaErrada: 0, confirmados: 405, firmes: 0.94, piorFolha: 2, zeroErrado: 0, legendaPerfeitas: 66, lixoAlta: 0, semSaida: 0 };
+const META = { pecas: 0.94, altaErrada: 0, confirmados: 405, firmes: 0.94, piorFolha: 2, zeroErrado: 0, legendaPerfeitas: 66, lixoAlta: 0, semSaida: 0, sujas: 0.85 };
 
 const norm = (s: string) => (s || '').toUpperCase().normalize('NFD').replace(/[^A-Z0-9]/g, '');
 const iou = (a: number[], b: number[]) => { const x0 = Math.max(a[0], b[0]), y0 = Math.max(a[1], b[1]), x1 = Math.min(a[2], b[2]), y1 = Math.min(a[3], b[3]); const i = Math.max(0, x1 - x0) * Math.max(0, y1 - y0); const u = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - i; return u > 0 ? i / u : 0; };
@@ -265,6 +266,65 @@ async function clique(): Promise<boolean> {
   return true;
 }
 
+// ---------------- SUJAS: o que um PDF de CAD real tem e os geradores antigos não faziam ----------------
+// Os outros conjuntos medem o motor contra folhas que o projeto desenha do jeito que o motor gosta de ler.
+// Este mede contra CINCO propriedades de PDF exportado de CAD de verdade, cada uma isolada numa folha para
+// que dê para saber o que cada uma custa (bench/gerar/gen4.py):
+//   preenchido   espessura de pena: o traço sai como CONTORNO FECHADO E PREENCHIDO, não como traço
+//   misto        a mesma coisa, mas só na planta — legenda e planta plotadas com penas diferentes
+//   duasEscalas  o detalhe ampliado ao lado da planta: o mesmo símbolo, 2 a 3 vezes maior
+//   recorte      a planta é uma janela do espaço-modelo, e o desenho é cortado no meio do traço
+//   duplicado    copiar-colar em cima do próprio desenho: o símbolo desenhado duas vezes no mesmo lugar
+//   wipeout      retângulo branco por cima, tapando parte do que está atrás
+// "limpa" é a mesma folha sem nenhuma delas: é o controle, e tem de ficar em 100%.
+async function sujas(): Promise<boolean> {
+  const dir = path.join(B, 'sujas');
+  const arq = path.join(dir, 'gt.json');
+  if (!fs.existsSync(arq)) { console.log('\nSUJAS — pulada: falta bench/sujas/gt.json (gere com gerar/gen4.py)'); return true; }
+  const GT = JSON.parse(fs.readFileSync(arq, 'utf8'));
+  const CHAVES = ['preenchido', 'duasEscalas', 'recorte', 'duplicado', 'wipeout'];
+  type Acc = { itens: number; exatos: number; alta: number; altaErrada: number };
+  const novo = (): Acc => ({ itens: 0, exatos: 0, alta: 0, altaErrada: 0 });
+  const tot = novo(), porProp = new Map<string, Acc>();
+  const erradas: string[] = [], detalhe: string[] = [];
+  const t0 = Date.now();
+  await emParalelo(GT, async (g: any) => {
+    const out = await rodar([path.join(dir, g.arquivo)]);
+    if (out.erro) { detalhe.push(`${g.arquivo}: ${out.erro}`); return; }
+    const pred = out.folhas.flatMap((f: any) => f.itens).filter((x: any) => x.tipo !== 'NOTA');
+    const usados = new Set<number>();
+    // o nome da folha diz qual propriedade ela isola; "limpa" é o controle
+    const quais = CHAVES.filter((c) => g.suja[c]);
+    const rotulo = /^misto/.test(g.arquivo) ? 'misto' : (quais.length === 1 ? quais[0] : quais.length ? quais.join('+') : 'limpa');
+    for (const it of g.itens) {
+      const k = pred.findIndex((p: any, j: number) => !usados.has(j) && norm(p.nome).slice(0, 24) === norm(it.texto).slice(0, 24));
+      const p = k >= 0 ? pred[k] : null; if (k >= 0) usados.add(k);
+      const certo = !!p && p.qtd === it.qtd;
+      const a = porProp.get(rotulo) || novo(); porProp.set(rotulo, a);
+      for (const b of [tot, a]) {
+        b.itens++; if (certo) b.exatos++;
+        if (p && p.conf === 'ALTA') { b.alta++; if (!certo) b.altaErrada++; }
+      }
+      if (!certo) {
+        detalhe.push(`${g.arquivo} · ${String(it.texto).slice(0, 30)} · gabarito ${it.qtd} · motor ${p ? p.qtd : 'SUMIU'}`);
+        if (p && p.conf === 'ALTA') erradas.push(`${g.arquivo} · ${String(it.texto).slice(0, 30)} · gabarito ${it.qtd} · motor ${p.qtd}`);
+      }
+    }
+  });
+  const pct = (a: number, b: number) => (b ? ((100 * a) / b).toFixed(1) + '%' : '—');
+  console.log(`\nSUJAS — ${GT.length} folhas com propriedade de PDF de CAD real, uma isolada por folha`);
+  console.log(`${tot.exatos} de ${tot.itens} itens com a quantidade exata (${pct(tot.exatos, tot.itens)}) · ${tot.alta} confirmados · ${tot.altaErrada} confirmados e ERRADOS  (${((Date.now() - t0) / 1000).toFixed(0)} s)\n`);
+  console.log('propriedade'.padEnd(14) + ['itens', 'exatos', '%', 'confirm. errados'].map((c) => c.padStart(17)).join(''));
+  for (const [k, a] of [...porProp.entries()].sort()) {
+    console.log(k.padEnd(14) + [a.itens, a.exatos, pct(a.exatos, a.itens), a.altaErrada].map((c) => String(c).padStart(17)).join(''));
+  }
+  if (process.env.V && detalhe.length) { console.log(`\nnão exatos (${detalhe.length}):`); detalhe.sort().slice(0, 50).forEach((d) => console.log('  ' + d)); }
+  let ok = true;
+  if (tot.altaErrada > META.altaErrada) { ok = false; console.log(`\nFALHOU: ${tot.altaErrada} quantidade(s) CONFIRMADA(S) errada(s) — o teto é 0:`); erradas.slice(0, 20).forEach((e) => console.log('  ' + e)); }
+  if (tot.exatos / tot.itens < META.sujas) { ok = false; console.log(`\nFALHOU: ${pct(tot.exatos, tot.itens)} de itens exatos nas sujas — o piso é ${META.sujas * 100}%`); }
+  return ok;
+}
+
 // ---------------- FIRMEZA: quanto de uma prancha desconhecida sai sem pedir revisão ----------------
 // A contagem mede se o número está CERTO. Isto mede quanto o Orcer se compromete: uma lista em que um
 // terço das linhas diz "confira" custa quase o trabalho que ela deveria poupar. Resposta FIRME = a linha
@@ -375,6 +435,7 @@ async function main() {
   const qual = process.argv[2] || 'tudo';
   const r: (boolean | null)[] = [];
   if (qual === 'tudo' || qual === 'contagem') r.push(await contagem());
+  if (qual === 'tudo' || qual === 'sujas') r.push(await sujas());
   if (qual === 'tudo' || qual === 'firmeza') r.push(await firmeza());
   if (qual === 'tudo' || qual === 'clique') r.push(await clique());
   if (qual === 'tudo' || qual === 'legenda') r.push(await legenda());

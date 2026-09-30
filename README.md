@@ -10,6 +10,23 @@ Tudo roda no navegador: o PDF não sai do computador de quem usa.
 >
 > Para medir em prancha de verdade — a sua, sem que ela saia do seu computador — existe `npm run aferir`, mais abaixo.
 
+### O que um PDF de CAD real tem e este benchmark não tinha
+
+O jeito de fechar parte dessa distância sem prancha real é **parar de desenhar folha fácil**. O `bench/gerar/gen4.py` desenha cinco propriedades que um PDF exportado de CAD de verdade tem e que nenhum gerador anterior fazia, uma isolada por folha:
+
+| propriedade | custava | custa |
+|---|---:|---:|
+| **espessura de pena**: o traço sai como contorno fechado e **preenchido**, não como traço | 4,9% | **100%** |
+| **detalhe ampliado** ao lado da planta: o mesmo símbolo 2 a 3× maior | 49,2% | **100%** |
+| legenda e planta plotadas com **penas diferentes** | 16,4% | 47,5% |
+| viewport **recortando** o desenho no meio do traço | 100% | 100% |
+| símbolo **duplicado** por copiar-colar em cima | 100% | 100% |
+| **wipeout** branco tapando parte do desenho | 100% | 100% |
+
+No conjunto inteiro: **92,5% exatos, 0 confirmados errados** (`npm run bench -- sujas`). O detalhe ampliado não custava só exatidão — custava **30 quantidades confirmadas e erradas** em 61 itens, que é o pior defeito que este produto pode ter.
+
+Isso ainda é folha gerada. Mas é gerada a partir do que o CAD faz, não do que o motor gosta de ler — e o controle (`limpa`, a mesma folha sem nenhuma sujeira) fica em 100%, o que mostra que a dificuldade está nas propriedades e não no desenho.
+
 | conjunto | itens | quantidade exata | confirmados errados |
 |---|---:|---:|---:|
 | normal (folhas geradas, 31 folhas) | 203 | 203 · 100% | 0 |

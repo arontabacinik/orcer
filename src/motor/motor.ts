@@ -295,8 +295,89 @@ import * as IDENTIDADE from "./identidade";
         }
       }
     }
+    // ---- A PENA QUE VIRA ÁREA ----
+    // Plotter com espessura de pena (e polilinha com largura) não exporta TRAÇO: exporta o CONTORNO do
+    // traço, fechado e preenchido. Um traço de 0,5 mm sai como uma fita de 0,5 mm de largura. Na tela é
+    // igual; para quem lê o PDF é outra coisa — outros operadores, `fill` em vez de `stroke`, e um símbolo
+    // de 3 traços vira 16 quadradinhos. Medido: o motor caía de 100% para 9,8% numa folha assim.
+    // Aqui a fita volta a ser o traço que ela desenha: o eixo. Vale para o quadrilátero (um segmento) e
+    // para a fita comprida (uma polilinha), que é como o CAD gera os dois casos — os vértices vêm num
+    // sentido e voltam no outro, então o vértice i casa com o n-1-i e o meio dos dois é o eixo.
+    // NÃO vale para área que é área: a largura tem de ser pequena perto do comprimento, e constante.
+    function eixoDaFita(p: any) {
+      if (!p.fill || p.stroke) return null;                     // fita é preenchida e sem traço próprio
+      const P = p.pts; if (!P || P.length < 8) return null;
+      let n = P.length / 2;
+      // fechada de verdade ou fechada repetindo o primeiro ponto — o CAD faz das duas formas, e o
+      // operador de fechamento nem sempre chega até aqui
+      const volta = Math.hypot(P[0] - P[(n - 1) * 2], P[1] - P[(n - 1) * 2 + 1]);
+      if (volta < 1e-6) n--; else if (!p.closed) return null;
+      if (n < 4 || n % 2 || n > 64) return null;
+      const k = n / 2, meio: number[] = [], larg: number[] = [];
+      for (let i = 0; i < k; i++) {
+        const ax = P[i * 2], ay = P[i * 2 + 1], bx = P[(n - 1 - i) * 2], by = P[(n - 1 - i) * 2 + 1];
+        meio.push((ax + bx) / 2, (ay + by) / 2); larg.push(Math.hypot(bx - ax, by - ay));
+      }
+      let comp = 0;
+      for (let i = 0; i < k - 1; i++) comp += Math.hypot(meio[(i + 1) * 2] - meio[i * 2], meio[(i + 1) * 2 + 1] - meio[i * 2 + 1]);
+      const lmin = Math.min.apply(null, larg), lmax = Math.max.apply(null, larg);
+      if (!(comp > 0) || lmax <= 0) return null;
+      if (lmax > lmin * 3 + 0.25) return null;                  // largura tem de ser mais ou menos constante
+      if (lmax > 6) return null;                                // pena de mais de 6 pt não existe em prancha
+      const segs: number[] = [];
+      for (let i = 0; i < k - 1; i++) segs.push(meio[i * 2], meio[i * 2 + 1], meio[(i + 1) * 2], meio[(i + 1) * 2 + 1]);
+      if (!segs.length) return null;
+      // a prova de que e traco, e nao area, e ser COMPRIDA perto da largura. Uma fita curta sozinha nao
+      // prova nada — mas o CAD exporta arco com espessura como uma CORRENTE de fitas curtas, ponta com
+      // ponta, e a corrente inteira e comprida. Por isso o teste de finura fica para depois de encadear:
+      // sozinha, a corda de um circulo de 24 lados e tao larga quanto comprida.
+      return { segs, len: comp, lw: (lmin + lmax) / 2, larg: lmax };
+    }
+
+    // encadeia fitas consecutivas que se tocam ponta a ponta: e um traco so, quebrado pelo exportador
+    const cand: any[] = prims.map(eixoDaFita);
+    const usado: boolean[] = new Array(prims.length).fill(false);
+    const pontaA = (e: any) => [e.segs[0], e.segs[1]];
+    const pontaB = (e: any) => [e.segs[e.segs.length - 2], e.segs[e.segs.length - 1]];
+    const mesmo = (a: number[], b: number[], t: number) => Math.hypot(a[0] - b[0], a[1] - b[1]) <= t;
+    for (let i = 0; i < prims.length; i++) {
+      if (usado[i] || !cand[i]) continue;
+      const corrente = [i]; let segs: number[] = cand[i].segs.slice(), comp = cand[i].len, larg = cand[i].larg;
+      for (let j = i + 1; j < prims.length; j++) {
+        const e = cand[j];
+        if (usado[j] || !e) continue;
+        if (prims[j].fill !== prims[i].fill || prims[j].layer !== prims[i].layer) continue;
+        if (Math.max(e.larg, larg) > Math.min(e.larg, larg) * 2 + 0.2) continue;
+        const t = Math.max(0.4, larg);
+        const fim = [segs[segs.length - 2], segs[segs.length - 1]];
+        let novo: number[] | null = null;
+        if (mesmo(fim, pontaA(e), t)) novo = e.segs;
+        else if (mesmo(fim, pontaB(e), t)) { novo = []; for (let q = e.segs.length - 4; q >= 0; q -= 4) novo.push(e.segs[q + 2], e.segs[q + 3], e.segs[q], e.segs[q + 1]); }
+        if (!novo) continue;
+        segs = segs.concat(novo); comp += e.len; larg = Math.max(larg, e.larg);
+        corrente.push(j); usado[j] = true;
+      }
+      if (comp <= larg * 2) continue;                           // agora sim: comprida perto da largura?
+      usado[i] = true;
+      cand[i] = { segs, len: comp, lw: larg, larg };
+      for (const j of corrente.slice(1)) { prims[j].hidden = true; cand[j] = null; }
+    }
+
+    let fitas = 0;
+    for (const p of prims) {
+      if (p.hidden) continue;
+      const e = usado[p.i] ? cand[p.i] : null; if (!e) continue;
+      p.segs = e.segs; p.len = e.len; p.lw = e.lw;
+      p.stroke = p.fill; p.fill = null; p.closed = false;
+      p.ops = "M" + "L".repeat(e.segs.length / 4);
+      p.pts = [];
+      let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      for (let i = 0; i < e.segs.length; i += 2) { const x = e.segs[i], y = e.segs[i + 1]; if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+      p.bbox = [x0, y0, x1, y1]; p.dePena = true; fitas++;
+    }
     const visible = hidden ? prims.filter(p => !p.hidden) : prims;
     visible.forEach((p, k) => p.i = k);
+    if (fitas && typeof process !== "undefined" && process.env && process.env.DBGPENA) console.log("PENA", fitas, "de", prims.length, "eram contorno de traço");
     const raster = imgArea > vp.width * vp.height * 0.3 && visible.length < 400;
     return { pageNum, width: vp.width, height: vp.height, rotation: vp.rotation, prims: visible, texts, page, clipped, hidden, raster, imgArea };
   }
@@ -1300,6 +1381,31 @@ import * as IDENTIDADE from "./identidade";
         if (it.molde) { const m = it.molde; it.moldeProprio = keep.some(b => { const cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2; return cx >= m[0] && cx <= m[2] && cy >= m[1] && cy <= m[3]; }); }
         it.ident = { ok: keep.length, rej: duv.length, pobre: it._ic.pobre, neutro: it._ic.neutro };
       }
+      // ---- UMA VISTA TEM UMA ESCALA ----
+      // Toda prancha traz o DETALHE AMPLIADO ao lado da planta: o mesmo dispositivo, desenhado 2 ou 3 vezes
+      // maior, para mostrar a montagem. Ele não é mais um material — é o mesmo, visto de perto. O motor
+      // casava com ele (a busca enxerga escala, de propósito) e SOMAVA, com confiança: medido numa folha
+      // com detalhe, 30 de 61 itens saíam CONFIRMADOS e errados, sempre por exatamente uma unidade a mais.
+      // O sinal é inequívoco e o motor já o tinha na mão: a escala de cada ocorrência. Dentro de uma vista
+      // elas são iguais a menos de ruído (os geradores variam ±6%); o detalhe aparece a 250%.
+      // Corte em 1,35: muito acima do ruído, muito abaixo de qualquer ampliação de detalhe.
+      for (const it of pointItems) {
+        const sc = it.scales;
+        if (!sc || sc.length < 3 || !it.marks || it.marks.length !== sc.length) continue;
+        const ord = sc.slice().sort((a, b) => a - b), meio = ord[ord.length >> 1];
+        if (!(meio > 0)) continue;
+        const fora = [], dentro = [], dScales = [];
+        for (let k = 0; k < sc.length; k++) {
+          const r = sc[k] / meio;
+          if (r > 1.35 || r < 1 / 1.35) fora.push(it.marks[k]);
+          else { dentro.push(it.marks[k]); dScales.push(sc[k]); }
+        }
+        // só vale quando a vista principal é claramente a maioria: metade e metade não é detalhe, é outra coisa
+        if (!fora.length || dentro.length < sc.length * 0.6) continue;
+        it.outraVista = fora.length;
+        it.marks = dentro; it.scales = dScales; it.qty = dentro.length;
+        if (it.ident) it.ident.ok = dentro.length;
+      }
       // GÊMEOS: o ícone de um item também É o desenho que outro item contou, na mesma cor. A forma não tem como
       // dizer qual é qual — um ponto preto numa planta preta pode ser a tomada média ou o ponto de dados.
       const julgados = pointItems.filter(it => it._ic && it.marks && it.marks.length);
@@ -1776,6 +1882,7 @@ import * as IDENTIDADE from "./identidade";
           if (it.porTamanho) { conf = "MEDIA"; notes.push("A legenda tem este mesmo desenho em outro tamanho, noutro item: separei as ocorrências pelo tamanho na planta. Confira."); }
           if (it.partialFit) { conf = "MEDIA"; notes.push(it.partialFit + " ocorrência(s) com partes faltando — confira."); }
           if (it.rejectedScale) notes.push(it.rejectedScale + " forma(s) parecida(s) em outra escala ignorada(s).");
+          if (it.outraVista) notes.push(it.outraVista + " desenho(s) do mesmo símbolo em OUTRA ESCALA ficaram de fora da conta: é o detalhe ampliado — o mesmo dispositivo visto de perto, não material a mais.");
         }
       } else {
         // ROTA de ícone sem marca própria (linha preta lisa) casa com qualquer linha: na pub1 o motor mediu

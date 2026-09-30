@@ -1,16 +1,33 @@
 # Bench
 
-`npm run bench` mede cinco coisas e falha se algum portão ficar vermelho:
+`npm run bench` mede seis coisas e falha se algum portão ficar vermelho:
 
 | subcomando | o que mede | portão |
 |---|---|---|
 | `contagem` | quantidade exata por item em 102 folhas com gabarito | ≥ 94% exatos · 0 confirmados errados |
+| `sujas` | propriedades de PDF de **CAD real**, uma isolada por folha | ≥ 85% exatos · 0 confirmados errados |
 | `firmeza` | quanto de uma prancha desconhecida sai sem pedir revisão | ≥ 94% firmes · pior folha deixa ≤ 2 · 0 zeros errados |
 | `clique` | o que ficou em Revisar: apontar UM exemplar resolve? | 0 itens sem saída |
 | `legenda` | itens da legenda em 80 folhas nunca vistas (`legenda/`) | ≥ 66 folhas perfeitas · 0 lixo |
 | `lista` | 144 folhas de pranchas públicas reais | 0 lixo confirmado |
 
 `npm run bench -- contagem` roda só um. Variáveis: `SET=normal,dificil,lote,sinteticas`, `PAR=4` (processos em paralelo), `V=1` (detalhe por item).
+
+As `sujas` existem porque os outros conjuntos medem o motor contra folhas que **este projeto** desenha, do jeito que o motor gosta de ler. O `gen4.py` desenha cinco propriedades que um PDF exportado de CAD de verdade tem e que nenhum dos outros geradores fazia, **uma isolada por folha**, para que dê para saber o que cada uma custa:
+
+| propriedade | o que é | custava | custa |
+|---|---|---:|---:|
+| `preenchido` | espessura de pena: o traço sai como contorno **fechado e preenchido**, não como traço | 4,9% | **100%** |
+| `duasEscalas` | o detalhe ampliado ao lado da planta: o mesmo símbolo, 2 a 3× maior | 49,2% | **100%** |
+| `misto` | legenda e planta plotadas com **penas diferentes** | 16,4% | 47,5% |
+| `recorte` | a planta é uma janela do espaço-modelo, cortada no meio do traço | 100% | 100% |
+| `duplicado` | copiar-colar em cima: o símbolo desenhado duas vezes no mesmo lugar | 100% | 100% |
+| `wipeout` | retângulo branco por cima, tapando parte do desenho | 100% | 100% |
+| `limpa` | a mesma folha sem nenhuma delas — o controle | 100% | 100% |
+
+O `duasEscalas` não custava só exatidão: custava **30 quantidades CONFIRMADAS e erradas** em 61 itens, sempre uma unidade a mais. Era o pior tipo de defeito que este produto pode ter, e não aparecia em nenhum conjunto antigo.
+
+`bench/sujas/` vai pronto no repositório (2,7 MB). Para regerar: `SO=<propriedade> python3 gerar/gen4.py 12 7300 <prefixo> <saida.json>` (sem `SO`, as cinco se sorteiam juntas, o que serve para estressar mas não para atribuir).
 
 A `firmeza` é a outra metade da `contagem`. A contagem mede se o número está **certo**; a firmeza mede quanto o Orcer se **compromete** — quantas linhas saem sem pedir conferência. Um motor que passa a duvidar de tudo fica "certo" e inútil, e sem esse portão nada segurava isso. Resposta firme = **Confirmado** (com quantidade) ou **Zero** (não tem na planta); um ZERO sobre item que existe conta como mentira, igual a uma quantidade confirmada errada. O conjunto `lote` fica de fora: ali "Revisar" é a resposta certa.
 
